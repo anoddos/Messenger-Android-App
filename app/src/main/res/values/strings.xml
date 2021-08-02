@@ -4,7 +4,9 @@
     <string name="enter_password">Enter your password</string>
     <string name="sign_in">SIGN IN</string>
     <string name="sign_up">SIGN UP</string>
+    <string name="sign_out">SIGN OUT</string>
     <string name="sign_up_question">Not registered?</string>
     <string name="what_i_do">What I do</string>
     <string name="search">Search</string>
+    <string name="update">  Update  </string>
 </resources>

@@ -13,7 +13,11 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun sign_in(view: View) {}
+    fun sign_in(view: View) {
+        // droebit
+        val intent = Intent(this, ProfileActivity::class.java)
+        startActivity(intent)
+    }
 
 
     fun sign_up(view: View) {
