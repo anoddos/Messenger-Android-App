@@ -44,7 +44,7 @@
 
                 android:text="Hello! What's up?" />
 
-    </>
+    </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
     <TextView
