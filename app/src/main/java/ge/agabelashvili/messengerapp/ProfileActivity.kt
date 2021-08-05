@@ -7,28 +7,43 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.widget.Button
 import android.widget.ImageView
+import androidx.fragment.app.Fragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class ProfileActivity : AppCompatActivity() {
     lateinit var imageView: ImageView
+    lateinit var bottomNavigationView: BottomNavigationView
     private val pickImage = 100
     private var imageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_profile)
+        setContentView(R.layout.navigation)
 
-        imageView = findViewById(R.id.ProfilePicture)
-        imageView.setOnClickListener {
-            val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
-            startActivityForResult(gallery, pickImage)
+
+        val mainPageFragment = MainPageFragment()
+        val settingsFragment = SettingsFragment()
+
+        setCurrentFragment(mainPageFragment)
+        bottomNavigationView = findViewById(R.id.bottomNavigationMenuWrap)
+
+        bottomNavigationView.background = null
+        bottomNavigationView.menu.getItem(1).isEnabled = false
+
+        bottomNavigationView.setOnNavigationItemSelectedListener {
+            when(it.itemId){
+                R.id.home->setCurrentFragment(mainPageFragment)
+                R.id.settings->setCurrentFragment(settingsFragment)
+            }
+            true
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK && requestCode == pickImage) {
-            imageUri = data?.data
-            imageView.setImageURI(imageUri)
-        }
-    }
+
+    private fun setCurrentFragment(fragment: Fragment)=
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.currentFragment,fragment)
+            commit() }
+
+
 }
