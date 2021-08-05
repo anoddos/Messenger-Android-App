@@ -8,4 +8,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="bright_sky">#5479f1</color>
+    <color name="message_time_color">#C0C0C0</color>
+    <color name="message_to_me_card_color">#E7E9ED</color>
+    <color name="message_from_me_txt_color">#F3EFEF</color>
+    <color name="message_to_me_txt_color">#474545</color>
 </resources>
