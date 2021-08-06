@@ -10,6 +10,9 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_register.*
 import java.util.*
@@ -54,7 +57,8 @@ class RegisterActivity : AppCompatActivity() {
 
             }
         uploadImageToFirebase()
-
+        val intent = Intent(this, ProfileActivity::class.java)
+        startActivity(intent)
     }
 
     private fun uploadImageToFirebase(){
@@ -66,15 +70,37 @@ class RegisterActivity : AppCompatActivity() {
         ref.putFile(imageUri!!)
             .addOnSuccessListener {
                 Log.d("Register", "saved image")
+
+                ref.downloadUrl.addOnSuccessListener {
+                    it.toString()
+                    saveUserToDb(it.toString())
+                }
+            }
+            .addOnFailureListener{
+
             }
     }
 
+    private fun saveUserToDb(profileImageUrl: String) {
+        val uid = FirebaseAuth.getInstance().uid ?: ""
+        val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
+        val myRef = database.getReference("/users/$uid")
+        val user = User(uid.toString(), Name.text.toString(),  profileImageUrl)
 
-  /*  service firebase.storage {
-        match /b/{bucket}/o {
-            match /{allPaths=**} {
-                allow read, write: if request.auth != null;
+        myRef.setValue(user)
+            .addOnSuccessListener {
+                Log.d("Register", "saved user")
+
             }
-        }
-    }*/
+    }
+
+    /*  service firebase.storage {
+          match /b/{bucket}/o {
+              match /{allPaths=**} {
+                  allow read, write: if request.auth != null;
+              }
+          }
+      }*/
 }
+
+class User(val uid : String, val userName : String, val profileImageUrl : String )
