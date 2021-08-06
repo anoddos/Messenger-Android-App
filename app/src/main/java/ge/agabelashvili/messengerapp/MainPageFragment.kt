@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainPageFragment : Fragment() {
 
@@ -20,6 +21,8 @@ class MainPageFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.fragment_main_page, container, false)
+        //val navBar: BottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationMenuWrap)
+
 
 
         return root

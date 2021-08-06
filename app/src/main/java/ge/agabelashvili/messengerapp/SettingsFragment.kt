@@ -44,7 +44,6 @@ class SettingsFragment : Fragment() {
             startActivityForResult(gallery, pickImage)
         }
 
-
         return root
     }
 
