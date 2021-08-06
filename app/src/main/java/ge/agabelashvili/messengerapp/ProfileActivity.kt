@@ -13,8 +13,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 class ProfileActivity : AppCompatActivity() {
     lateinit var imageView: ImageView
     lateinit var bottomNavigationView: BottomNavigationView
-    private val pickImage = 100
-    private var imageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
