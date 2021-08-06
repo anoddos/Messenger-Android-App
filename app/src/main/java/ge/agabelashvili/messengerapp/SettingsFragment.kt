@@ -14,7 +14,7 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.android.synthetic.main.activity_profile.*
+import kotlinx.android.synthetic.main.fragment_settings.*
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -47,10 +47,9 @@ class SettingsFragment : Fragment() {
             startActivityForResult(gallery, pickImage)
         }
 
-        //TODO logout
-/*
+        val button : Button = root.findViewById(R.id.sign_out_button)
 
-        sign_out_button.setOnClickListener{
+        button.setOnClickListener{
             FirebaseAuth.getInstance().signOut()
             val intent = Intent(activity, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -58,7 +57,7 @@ class SettingsFragment : Fragment() {
             startActivity(intent)
         }
 
-*/
+
 
 
         return root
