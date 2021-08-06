@@ -10,7 +10,6 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
@@ -57,8 +56,6 @@ class RegisterActivity : AppCompatActivity() {
 
             }
         uploadImageToFirebase()
-        val intent = Intent(this, ProfileActivity::class.java)
-        startActivity(intent)
     }
 
     private fun uploadImageToFirebase(){
@@ -85,12 +82,15 @@ class RegisterActivity : AppCompatActivity() {
         val uid = FirebaseAuth.getInstance().uid ?: ""
         val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
         val myRef = database.getReference("/users/$uid")
-        val user = User(uid.toString(), Name.text.toString(),  profileImageUrl)
+        val user = User(uid.toString(), Name.text.toString(),  profileImageUrl, what_I_Do.text.toString())
 
         myRef.setValue(user)
             .addOnSuccessListener {
                 Log.d("Register", "saved user")
+                val intent = Intent(this, ProfileActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
 
+                startActivity(intent)
             }
     }
 
@@ -103,4 +103,4 @@ class RegisterActivity : AppCompatActivity() {
       }*/
 }
 
-class User(val uid : String, val userName : String, val profileImageUrl : String )
+class User(val uid: String, val userName: String, val profileImageUrl: String, possition : String)
