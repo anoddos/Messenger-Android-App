@@ -1,17 +1,46 @@
 package ge.agabelashvili.messengerapp
 
+import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_register.*
+import java.util.*
 
 class RegisterActivity : AppCompatActivity() {
+
+    lateinit var imageView: ImageView
+    private val pickImage = 100
+    private var imageUri: Uri? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
+
+        imageView = ProfilePicture as ImageView
+        imageView.setOnClickListener {
+            val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+            startActivityForResult(gallery, pickImage)
+        }
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK && requestCode == pickImage) {
+            imageUri = data?.data
+            imageView.setImageURI(imageUri)
+        }
     }
 
     fun register(view: View) {
@@ -24,12 +53,54 @@ class RegisterActivity : AppCompatActivity() {
         }
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener{
-                if (!it.isSuccessful) return@addOnCompleteListener
 
             }
+        uploadImageToFirebase()
+    }
 
+    private fun uploadImageToFirebase(){
+        if(imageUri == null) return
+
+        val fileName = UUID.randomUUID().toString()
+        val ref = FirebaseStorage.getInstance().getReference("/images/$fileName")
+
+        ref.putFile(imageUri!!)
+            .addOnSuccessListener {
+                Log.d("Register", "saved image")
+
+                ref.downloadUrl.addOnSuccessListener {
+                    it.toString()
+                    saveUserToDb(it.toString())
+                }
+            }
             .addOnFailureListener{
 
             }
     }
+
+    private fun saveUserToDb(profileImageUrl: String) {
+        val uid = FirebaseAuth.getInstance().uid ?: ""
+        val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
+        val myRef = database.getReference("/users/$uid")
+        val user = User(uid.toString(), Name.text.toString(),  profileImageUrl, what_I_Do.text.toString())
+
+        myRef.setValue(user)
+            .addOnSuccessListener {
+                Log.d("Register", "saved user")
+                val intent = Intent(this, ProfileActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+                startActivity(intent)
+            }
+    }
+
+    /*  service firebase.storage {
+          match /b/{bucket}/o {
+              match /{allPaths=**} {
+                  allow read, write: if request.auth != null;
+              }
+          }
+      }*/
 }
+
+class User(val uid: String, val userName: String, val profileImageUrl: String, possition : String)

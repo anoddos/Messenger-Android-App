@@ -10,15 +10,15 @@
         android:id="@+id/sign_in_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="32dp"
         android:backgroundTint="@color/bright_sky"
         android:onClick="sign_in"
         android:text="@string/sign_in"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintHorizontal_bias="0.487"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Possition" />
+        app:layout_constraintTop_toBottomOf="@+id/Password" />
 
     <Button
         android:id="@+id/sign_up_button"
@@ -55,7 +55,7 @@
         app:layout_constraintTop_toBottomOf="@+id/ProfilePicture" />
 
     <EditText
-        android:id="@+id/Possition"
+        android:id="@+id/Password"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -65,7 +65,7 @@
         android:ems="10"
         android:gravity="center"
         android:hint="@string/enter_password"
-        android:inputType="textPersonName"
+        android:inputType="textPassword"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
