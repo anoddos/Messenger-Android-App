@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.android.synthetic.main.navigation.*
 
 class ProfileActivity : AppCompatActivity() {
     lateinit var imageView: ImageView
@@ -35,6 +36,12 @@ class ProfileActivity : AppCompatActivity() {
             }
             true
         }
+
+        floatingAddButton.setOnClickListener {
+            val intent = Intent(this, NewMessageActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 
 
