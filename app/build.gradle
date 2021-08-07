@@ -50,7 +50,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.google.firebase:firebase-storage-ktx'
     implementation 'com.google.firebase:firebase-database-ktx'
-    implementation "com.xwray:groupie:$groupie_version"
+    implementation "com.xwray:groupie:2.9.0"
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
 
 
 

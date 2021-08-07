@@ -26,7 +26,6 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-
         imageView = ProfilePicture as ImageView
         imageView.setOnClickListener {
             val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
@@ -53,13 +52,16 @@ class RegisterActivity : AppCompatActivity() {
         }
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener{
-
+                FirebaseAuth.getInstance().uid
+                uploadImageToFirebase()
             }
-        uploadImageToFirebase()
     }
 
     private fun uploadImageToFirebase(){
-        if(imageUri == null) return
+        if(imageUri == null){
+            Toast.makeText(this, "Please upload picture", Toast.LENGTH_LONG)
+            return
+        }
 
         val fileName = UUID.randomUUID().toString()
         val ref = FirebaseStorage.getInstance().getReference("/images/$fileName")
@@ -68,13 +70,19 @@ class RegisterActivity : AppCompatActivity() {
             .addOnSuccessListener {
                 Log.d("Register", "saved image")
 
-                ref.downloadUrl.addOnSuccessListener {
+                ref.downloadUrl
+                    .addOnSuccessListener {
                     it.toString()
                     saveUserToDb(it.toString())
                 }
+                .addOnFailureListener{
+                    val res = it.toString()
+                    Log.d("Register", it.toString())
+                }
             }
             .addOnFailureListener{
-
+                val res = it.toString()
+                Log.d("Register", it.toString())
             }
     }
 
@@ -82,25 +90,21 @@ class RegisterActivity : AppCompatActivity() {
         val uid = FirebaseAuth.getInstance().uid ?: ""
         val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
         val myRef = database.getReference("/users/$uid")
-        val user = User(uid.toString(), Name.text.toString(),  profileImageUrl, what_I_Do.text.toString())
+
+        val position =  what_I_Do.text.toString() ?: ""
+        val user = User(uid, Name.text.toString(),  profileImageUrl, position)
 
         myRef.setValue(user)
             .addOnSuccessListener {
                 Log.d("Register", "saved user")
                 val intent = Intent(this, ProfileActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
-
                 startActivity(intent)
             }
     }
 
-    /*  service firebase.storage {
-          match /b/{bucket}/o {
-              match /{allPaths=**} {
-                  allow read, write: if request.auth != null;
-              }
-          }
-      }*/
 }
 
-class User(val uid: String, val userName: String, val profileImageUrl: String, possition : String)
+class User(val uid: String, val userName: String, val profileImageUrl: String, position : String){
+    constructor() : this("", "", "", "")
+}
