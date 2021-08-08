@@ -3,6 +3,8 @@ package ge.agabelashvili.messengerapp
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.EditText
+import android.widget.TextView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -68,7 +70,8 @@ class ChatActivity : AppCompatActivity() {
         var layoutManager: LinearLayoutManager = LinearLayoutManager(this)
         layoutManager.stackFromEnd = true
         recyclerView_chat.layoutManager = layoutManager
-        
+        val newMsg: EditText =  findViewById(R.id.chat_log)
+
         recyclerView_chat.adapter = adapter
 
         ref.addChildEventListener(object: ChildEventListener{
@@ -81,6 +84,7 @@ class ChatActivity : AppCompatActivity() {
                     }else if(currentMessage.fromId ==  friend.uid && currentMessage.toId == FirebaseAuth.getInstance().uid){
                         adapter.add(ChatFromItem(currentMessage.text))
                     }
+                    newMsg.text.clear()
                 }
             }
 
