@@ -1,21 +1,20 @@
 package ge.agabelashvili.messengerapp
 
+import android.app.Activity
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import android.widget.TextView
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
@@ -73,7 +72,7 @@ class ChatActivity : AppCompatActivity() {
         val newMsg: EditText =  findViewById(R.id.chat_log)
 
         recyclerView_chat.adapter = adapter
-
+        var context: Context = this
         ref.addChildEventListener(object: ChildEventListener{
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 val currentMessage = snapshot.getValue(Message::class.java)
@@ -86,6 +85,7 @@ class ChatActivity : AppCompatActivity() {
                     }
                     newMsg.text.clear()
                     recyclerView_chat.scrollToPosition(adapter.itemCount - 1)
+                    closeSoftKeyboard(context,newMsg)
                 }
             }
 
@@ -103,6 +103,12 @@ class ChatActivity : AppCompatActivity() {
 
         })
 
+    }
+
+    private fun closeSoftKeyboard(context: Context, v: View) {
+        val iMm = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        iMm.hideSoftInputFromWindow(v.windowToken, 0)
+        v.clearFocus()
     }
 
 }
