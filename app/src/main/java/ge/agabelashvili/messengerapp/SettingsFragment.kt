@@ -17,7 +17,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_settings.*
+import kotlinx.android.synthetic.main.user_row_new_message.view.*
 import java.util.*
 
 // TODO: Rename parameter arguments, choose names that match
@@ -66,18 +68,15 @@ class SettingsFragment : Fragment() {
 
         val uid = FirebaseAuth.getInstance().uid ?: ""
         ref.child(uid).get().addOnSuccessListener {
-            Log.i("firebase", "Got value ${it.value}")
-            val pic = it.child("profileImageUrl").value
+            val pic = it.child("profileImageUrl").value.toString()
             if(pic != ""){
-
+                Picasso.get().load(pic).into( root.findViewById<ImageView>(R.id.ProfilePicture))
             }
             val name = it.child("userName").value.toString()
             root.findViewById<TextView>(R.id.Name).text = name
-/*
 
             val position = it.child("position").value.toString()
             root.findViewById<TextView>(R.id.position).text = position
-*/
 
         }.addOnFailureListener{
             Log.e("firebase", "Error getting data", it)

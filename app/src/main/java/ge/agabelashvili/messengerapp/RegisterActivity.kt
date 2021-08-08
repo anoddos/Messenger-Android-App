@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import ge.agabelashvili.messengerapp.model.User
 import kotlinx.android.synthetic.main.activity_register.*
 import java.util.*
 
@@ -118,8 +119,4 @@ class RegisterActivity : AppCompatActivity() {
 
     }
 
-}
-
-class User(val uid: String, val userName: String, val profileImageUrl: String, position : String){
-    constructor() : this("", "", "", "")
 }

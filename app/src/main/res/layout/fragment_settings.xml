@@ -10,13 +10,13 @@
         android:id="@+id/sign_in_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="32dp"
         android:backgroundTint="@color/bright_sky"
         android:text="@string/update"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Possition" />
+        app:layout_constraintTop_toBottomOf="@+id/position" />
 
     <ImageView
         android:id="@+id/ProfilePicture"
@@ -46,7 +46,7 @@
         app:layout_constraintTop_toBottomOf="@+id/ProfilePicture" />
 
     <EditText
-        android:id="@+id/Possition"
+        android:id="@+id/position"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -56,7 +56,7 @@
         android:ems="10"
         android:gravity="center"
         android:inputType="textPersonName"
-        android:text="Possition Here"
+        android:text="position Here"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

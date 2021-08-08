@@ -20,13 +20,14 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="50dp"
         android:text="TextView"
+        android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/possition"
+        app:layout_constraintBottom_toTopOf="@+id/new_message_position"
         app:layout_constraintStart_toEndOf="@+id/imageView_new_message"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/possition"
+        android:id="@+id/new_message_position"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TextView"

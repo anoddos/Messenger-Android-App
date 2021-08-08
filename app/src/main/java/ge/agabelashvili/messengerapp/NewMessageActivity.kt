@@ -13,6 +13,7 @@ import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
+import ge.agabelashvili.messengerapp.model.User
 import kotlinx.android.synthetic.main.activity_new_message.*
 import kotlinx.android.synthetic.main.user_row_new_message.view.*
 import java.text.FieldPosition
@@ -55,6 +56,7 @@ class NewMessageActivity : AppCompatActivity() {
 class UserItem(val user: User): Item<GroupieViewHolder>(){
     override fun bind (viewHolder: GroupieViewHolder, position: Int){
         viewHolder.itemView.userName.text = user.userName
+        viewHolder.itemView.new_message_position.text = user.position
         if(user.profileImageUrl != ""){
             Picasso.get().load(user.profileImageUrl).into(viewHolder.itemView.imageView_new_message)
         }
