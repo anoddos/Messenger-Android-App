@@ -2,6 +2,7 @@ package ge.agabelashvili.messengerapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
@@ -27,27 +28,25 @@ class ChatActivity : AppCompatActivity() {
         val user = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
 
 
-        fetchDataFromDataBase()
-
-        listenToMessages()
+        listenToComingMessages(user!!)
 
         listenToSendMessage(user!!)
 
 
     }
 
-    private fun listenToSendMessage( user: User) {
+    private fun listenToSendMessage( friend: User) {
         send_button.setOnClickListener{
 
             val txt = chat_log.text.toString()
             val fromId = FirebaseAuth.getInstance().uid
-            val toId = user.uid
+            val toId = friend.uid
 
 
             val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
             val ref = database.getReference("/messages").push()
 
-            val message = Message(ref.key!!, toId, fromId!!, txt, System.currentTimeMillis() )
+            val message = Message(ref.key!!, toId, fromId!!, txt, System.currentTimeMillis()/1000 )
             ref.setValue(message)
                 .addOnSuccessListener {
 
@@ -58,14 +57,24 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
-    private fun listenToMessages() {
+    private fun listenToComingMessages( friend: User) {
 
         val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
-        val ref = database.getReference("/messages").push()
+        val ref = database.getReference("/messages")
+        val adapter =  GroupAdapter<GroupieViewHolder>()
+        recyclerView_chat.adapter = adapter
 
         ref.addChildEventListener(object: ChildEventListener{
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-
+                val currentMessage = snapshot.getValue(Message::class.java)
+                if(currentMessage != null){
+                    Log.d("sdf", currentMessage.toString() )
+                    if(currentMessage.fromId == FirebaseAuth.getInstance().uid && currentMessage.toId == friend.uid){
+                        adapter.add(ChatToItem(currentMessage.text))
+                    }else if(currentMessage.fromId ==  friend.uid && currentMessage.toId == FirebaseAuth.getInstance().uid){
+                        adapter.add(ChatFromItem(currentMessage.text))
+                    }
+                }
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
@@ -84,17 +93,6 @@ class ChatActivity : AppCompatActivity() {
 
     }
 
-    private fun fetchDataFromDataBase() {
-        val adapter =  GroupAdapter<GroupieViewHolder>()
-
-        adapter.add(ChatFromItem("sdfsdfasd"))
-        adapter.add(ChatFromItem("dfsfdasdsadfg"))
-
-        recyclerView_chat.adapter = adapter
-
-
-
-    }
 }
 
 

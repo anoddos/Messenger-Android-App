@@ -13,7 +13,7 @@
         android:ems="10"
         android:inputType="textPersonName"
         android:text="Name"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/send_button"
         app:layout_constraintEnd_toStartOf="@+id/send_button"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -29,8 +29,12 @@
         android:id="@+id/recyclerView_chat"
         android:layout_width="409dp"
         android:layout_height="681dp"
+        android:layout_marginBottom="24dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@+id/send_button"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -79,7 +79,7 @@ class SettingsFragment : Fragment() {
             root.findViewById<TextView>(R.id.position).text = position
 
         }.addOnFailureListener{
-            Log.e("firebase", "Error getting data", it)
+            Log.e("firebase", "Error getting data")
         }
 
 
