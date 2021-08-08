@@ -3,6 +3,9 @@ package ge.agabelashvili.messengerapp
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
@@ -62,6 +65,10 @@ class ChatActivity : AppCompatActivity() {
         val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
         val ref = database.getReference("/messages")
         val adapter =  GroupAdapter<GroupieViewHolder>()
+        var layoutManager: LinearLayoutManager = LinearLayoutManager(this)
+        layoutManager.stackFromEnd = true
+        recyclerView_chat.layoutManager = layoutManager
+        
         recyclerView_chat.adapter = adapter
 
         ref.addChildEventListener(object: ChildEventListener{
