@@ -1,5 +1,6 @@
 package ge.agabelashvili.messengerapp
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.recyclerview.widget.RecyclerView
@@ -26,6 +27,10 @@ class NewMessageActivity : AppCompatActivity() {
         fetchUsers()
     }
 
+
+    companion object{
+        val USER_KEY = "USER_KEY"
+    }
     private fun fetchUsers() {
         val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
         val ref = database.getReference("/users")
@@ -40,6 +45,14 @@ class NewMessageActivity : AppCompatActivity() {
                     if(user!= null) {
                         adapter.add(UserItem(user))
                     }
+                }
+
+                adapter.setOnItemClickListener{ item, view ->
+                    val curUser = item as UserItem
+                    val intent = Intent(view.context, ChatActivity::class.java)
+                    intent.putExtra(USER_KEY, curUser.user)
+                    startActivity(intent)
+                    finish()
                 }
                 new_message_recyclerView.adapter = adapter
 
