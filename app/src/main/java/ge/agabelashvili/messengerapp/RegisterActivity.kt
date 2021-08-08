@@ -107,7 +107,6 @@ class RegisterActivity : AppCompatActivity() {
 
         myRef.setValue(user)
             .addOnSuccessListener {
-                Log.d("Register", "saved user")
                 val intent = Intent(this, ProfileActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)

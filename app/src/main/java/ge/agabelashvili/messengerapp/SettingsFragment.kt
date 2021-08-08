@@ -5,16 +5,20 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
-import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.fragment_settings.*
+import java.util.*
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -57,6 +61,28 @@ class SettingsFragment : Fragment() {
             startActivity(intent)
         }
 
+        val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
+        val ref = database.getReference("/users")
+
+        val uid = FirebaseAuth.getInstance().uid ?: ""
+        ref.child(uid).get().addOnSuccessListener {
+            Log.i("firebase", "Got value ${it.value}")
+            val pic = it.child("profileImageUrl").value
+            if(pic != ""){
+
+            }
+            val name = it.child("userName").value.toString()
+            root.findViewById<TextView>(R.id.Name).text = name
+/*
+
+            val position = it.child("position").value.toString()
+            root.findViewById<TextView>(R.id.position).text = position
+*/
+
+        }.addOnFailureListener{
+            Log.e("firebase", "Error getting data", it)
+        }
+
 
         return root
     }
@@ -66,7 +92,26 @@ class SettingsFragment : Fragment() {
         if (resultCode == RESULT_OK && requestCode == pickImage) {
             imageUri = data?.data
             imageView.setImageURI(imageUri)
+            uploadImageToFirebase()
         }
+    }
+
+    private fun uploadImageToFirebase(){
+        val fileName = UUID.randomUUID().toString()
+        val ref = FirebaseStorage.getInstance().getReference("/images/$fileName")
+        ref.putFile(imageUri!!)
+            .addOnSuccessListener {
+                ref.downloadUrl
+                    .addOnSuccessListener {
+                        Log.d("uploadImage", it.toString())
+                    }
+                    .addOnFailureListener{
+                        Log.d("uploadImage", it.toString())
+                    }
+            }
+            .addOnFailureListener{
+                Log.d("uploadImage", it.toString())
+            }
     }
 
 

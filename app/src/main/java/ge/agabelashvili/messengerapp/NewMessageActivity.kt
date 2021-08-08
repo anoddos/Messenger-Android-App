@@ -7,10 +7,14 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_new_message.*
+import kotlinx.android.synthetic.main.user_row_new_message.view.*
 import java.text.FieldPosition
 
 class NewMessageActivity : AppCompatActivity() {
@@ -22,7 +26,8 @@ class NewMessageActivity : AppCompatActivity() {
     }
 
     private fun fetchUsers() {
-        val ref = FirebaseDatabase.getInstance().getReference("/users")
+        val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
+        val ref = database.getReference("/users")
 
         ref.addListenerForSingleValueEvent(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -31,9 +36,12 @@ class NewMessageActivity : AppCompatActivity() {
 
                 snapshot.children.forEach{
                     val user = it.getValue(User::class.java)
-                    adapter.add(UserItem())
-                    new_message_recyclerView.adapter = adapter
+                    if(user!= null) {
+                        adapter.add(UserItem(user))
+                    }
                 }
+                new_message_recyclerView.adapter = adapter
+
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -44,14 +52,16 @@ class NewMessageActivity : AppCompatActivity() {
     }
 }
 
-class UserItem: Item<GroupieViewHolder>(){
+class UserItem(val user: User): Item<GroupieViewHolder>(){
     override fun bind (viewHolder: GroupieViewHolder, position: Int){
-
+        viewHolder.itemView.userName.text = user.userName
+        if(user.profileImageUrl != ""){
+            Picasso.get().load(user.profileImageUrl).into(viewHolder.itemView.imageView_new_message)
+        }
     }
 
     override fun getLayout(): Int {
         return R.layout.user_row_new_message
     }
-
 
 }
