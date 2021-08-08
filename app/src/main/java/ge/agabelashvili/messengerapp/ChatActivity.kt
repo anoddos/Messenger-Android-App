@@ -85,6 +85,7 @@ class ChatActivity : AppCompatActivity() {
                         adapter.add(ChatFromItem(currentMessage.text))
                     }
                     newMsg.text.clear()
+                    recyclerView_chat.scrollToPosition(adapter.itemCount - 1)
                 }
             }
 
