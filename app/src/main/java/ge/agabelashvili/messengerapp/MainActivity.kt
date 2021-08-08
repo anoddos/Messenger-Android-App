@@ -21,33 +21,26 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun sign_in(view: View) {
+    fun signIn(view: View) {
         val email = Name.text.toString()
         val password = Password.text.toString()
         if( email.isEmpty() || password.isEmpty() ){
             Toast.makeText(this, "Please fill in forms", Toast.LENGTH_SHORT)
-            return@sign_in
+            return@signIn
         }
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener{
-                if (!it.isSuccessful) {
-                    Toast.makeText(this, "warum", Toast.LENGTH_SHORT)
-                    return@addOnCompleteListener
-                }
+            .addOnSuccessListener {
+                val intent = Intent(this, ProfileActivity::class.java)
+                startActivity(intent)
             }
             .addOnFailureListener{
                 Toast.makeText(this, "nnnnooo", Toast.LENGTH_SHORT)
                 return@addOnFailureListener
             }
-
-        Toast.makeText(this, "yay", Toast.LENGTH_SHORT)
-
-        val intent = Intent(this, ProfileActivity::class.java)
-        startActivity(intent)
     }
 
 
-    fun sign_up(view: View) {
+    fun signUp(view: View) {
 
         val intent = Intent(this, RegisterActivity::class.java)
         startActivity(intent)

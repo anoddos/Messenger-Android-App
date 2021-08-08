@@ -45,31 +45,41 @@ class RegisterActivity : AppCompatActivity() {
     fun register(view: View) {
         val email = Name.text.toString()
         val password = Pass.text.toString()
-        val possition = what_I_Do.text.toString()
-        if( email.isEmpty() || password.isEmpty() || possition.isEmpty() ){
+        val position = what_I_Do.text.toString()
+        if( email.isEmpty() || password.isEmpty() || position.isEmpty() ){
             Toast.makeText(this, "Please fill in forms", Toast.LENGTH_SHORT)
             return@register
         }
+        if(password.length < 6){
+            Toast.makeText(this, "enter at leas 6 char pass", Toast.LENGTH_SHORT)
+            return@register
+        }
+
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener{
+            .addOnSuccessListener {
                 FirebaseAuth.getInstance().uid
                 uploadImageToFirebase()
             }
+            .addOnFailureListener{
+                val res = it.toString()
+                Log.d("Register", it.toString())
+            }
+
     }
 
     private fun uploadImageToFirebase(){
         if(imageUri == null){
-            Toast.makeText(this, "Please upload picture", Toast.LENGTH_LONG)
+            saveUserToDb("")
             return
         }
 
         val fileName = UUID.randomUUID().toString()
         val ref = FirebaseStorage.getInstance().getReference("/images/$fileName")
-
+        FirebaseAuth.getInstance().uid
         ref.putFile(imageUri!!)
             .addOnSuccessListener {
+                FirebaseAuth.getInstance().uid
                 Log.d("Register", "saved image")
-
                 ref.downloadUrl
                     .addOnSuccessListener {
                     it.toString()
@@ -92,7 +102,8 @@ class RegisterActivity : AppCompatActivity() {
         val myRef = database.getReference("/users/$uid")
 
         val position =  what_I_Do.text.toString() ?: ""
-        val user = User(uid, Name.text.toString(),  profileImageUrl, position)
+        val name =  Name.text.toString()
+        val user = User(uid, name,  profileImageUrl, position)
 
         myRef.setValue(user)
             .addOnSuccessListener {
@@ -101,6 +112,11 @@ class RegisterActivity : AppCompatActivity() {
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)
             }
+            .addOnFailureListener{
+                val res = it.toString()
+                Log.d("Register", it.toString())
+            }
+
     }
 
 }
