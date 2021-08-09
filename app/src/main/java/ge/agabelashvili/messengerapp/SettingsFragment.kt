@@ -46,6 +46,7 @@ class SettingsFragment : Fragment() {
     ): View? {
         val root = inflater.inflate(R.layout.fragment_settings, container, false)
 
+        showDataFromFirebase(root)
 
         imageView = root.findViewById(R.id.ProfilePicture)
         imageView.setOnClickListener {
@@ -53,9 +54,8 @@ class SettingsFragment : Fragment() {
             startActivityForResult(gallery, pickImage)
         }
 
-        val button : Button = root.findViewById(R.id.sign_out_button)
-
-        button.setOnClickListener{
+        val signOutButton : Button = root.findViewById(R.id.sign_out_button)
+        signOutButton.setOnClickListener{
             FirebaseAuth.getInstance().signOut()
             val intent = Intent(activity, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -63,6 +63,36 @@ class SettingsFragment : Fragment() {
             startActivity(intent)
         }
 
+        val updateOutButton : Button = root.findViewById(R.id.update_button)
+
+        updateOutButton.setOnClickListener{
+            val userName =  root.findViewById<TextView>(R.id.userName).text.toString()
+            val position =  root.findViewById<TextView>(R.id.position).text.toString()
+
+            val uid = FirebaseAuth.getInstance().uid
+            val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
+            database.getReference("/users/$uid/position").setValue(position)
+                .addOnSuccessListener {
+                    //TODO print
+                }
+                .addOnFailureListener{
+                    //TODO print
+
+                }
+            database.getReference("/users/$uid/userName").setValue(userName)
+                .addOnSuccessListener {
+                    //TODO print
+
+                }
+                .addOnFailureListener{
+                    //TODO print
+
+                }
+        }
+        return root
+    }
+
+    private fun showDataFromFirebase(root: View) {
         val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
         val ref = database.getReference("/users")
 
@@ -73,7 +103,7 @@ class SettingsFragment : Fragment() {
                 Picasso.get().load(pic).into( root.findViewById<ImageView>(R.id.ProfilePicture))
             }
             val name = it.child("userName").value.toString()
-            root.findViewById<TextView>(R.id.Name).text = name
+            root.findViewById<TextView>(R.id.userName).text = name
 
             val position = it.child("position").value.toString()
             root.findViewById<TextView>(R.id.position).text = position
@@ -82,9 +112,9 @@ class SettingsFragment : Fragment() {
             Log.e("firebase", "Error getting data")
         }
 
-
-        return root
     }
+
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -95,6 +125,7 @@ class SettingsFragment : Fragment() {
         }
     }
 
+
     private fun uploadImageToFirebase(){
         val fileName = UUID.randomUUID().toString()
         val ref = FirebaseStorage.getInstance().getReference("/images/$fileName")
@@ -102,6 +133,9 @@ class SettingsFragment : Fragment() {
             .addOnSuccessListener {
                 ref.downloadUrl
                     .addOnSuccessListener {
+                        val uid = FirebaseAuth.getInstance().uid
+                        val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
+                        database.getReference("/users/$uid/profileImageUrl").setValue(it.toString())
                         Log.d("uploadImage", it.toString())
                     }
                     .addOnFailureListener{
@@ -112,8 +146,4 @@ class SettingsFragment : Fragment() {
                 Log.d("uploadImage", it.toString())
             }
     }
-
-
-
-
 }

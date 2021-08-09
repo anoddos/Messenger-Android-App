@@ -31,12 +31,9 @@ class ChatActivity : AppCompatActivity() {
 
         val user = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
 
-
         listenToComingMessages(user!!)
 
         listenToSendMessage(user!!)
-
-
     }
 
     private fun listenToSendMessage( friend: User) {
@@ -48,23 +45,40 @@ class ChatActivity : AppCompatActivity() {
 
 
             val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
-            val ref = database.getReference("/messages").push()
+
+            val ref = database.getReference("/user-messages/$fromId/$toId").push()
+            val toRef = database.getReference("/user-messages/$toId/$fromId").push()
+
 
             val message = Message(ref.key!!, toId, fromId!!, txt, System.currentTimeMillis()/1000 )
             ref.setValue(message)
                 .addOnSuccessListener {
-
                 }
                 .addOnFailureListener{
-
                 }
+
+            toRef.setValue(message)
+                .addOnSuccessListener {
+                }
+                .addOnFailureListener{
+                }
+
+
+            val latestMassageRef = database.getReference("/latest-messages/$fromId/$toId")
+            val latestMassageRefTo = database.getReference("/latest-messages/$toId/$fromId")
+
+            latestMassageRef.setValue(message)
+            latestMassageRefTo.setValue(message)
         }
     }
 
     private fun listenToComingMessages( friend: User) {
-
+        val fromId =FirebaseAuth.getInstance().uid
+        val toId = friend.uid
         val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
-        val ref = database.getReference("/messages")
+        val ref = database.getReference("/user-messages/$fromId/$toId")
+
+
         val adapter =  GroupAdapter<GroupieViewHolder>()
         var layoutManager: LinearLayoutManager = LinearLayoutManager(this)
         layoutManager.stackFromEnd = true
@@ -91,13 +105,10 @@ class ChatActivity : AppCompatActivity() {
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
             }
-
             override fun onChildRemoved(snapshot: DataSnapshot) {
             }
-
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
             }
-
             override fun onCancelled(error: DatabaseError) {
             }
 
