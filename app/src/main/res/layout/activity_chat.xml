@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/chat_log_wrap"
+        android:layout_marginBottom="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -25,7 +26,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:contentScrim="?attr/colorPrimary"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed">
+                app:layout_scrollFlags="scroll|enterAlwaysCollapsed">
 
                 <android.widget.Toolbar
                     android:id="@+id/chat_toolbar"
@@ -40,7 +41,7 @@
                     android:background="@color/bright_sky"
                     android:scaleType="centerCrop"
                     app:layout_collapseMode="parallax"
-                    app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed" />
+                    app:layout_scrollFlags="exitUntilCollapsed" />
 
 
             </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -76,8 +77,6 @@
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:background="@drawable/edit_text_shape"
-            android:ems="10"
-
             android:hint="Message"
             android:inputType="textPersonName"
             app:layout_constraintBottom_toBottomOf="@id/send_button"
