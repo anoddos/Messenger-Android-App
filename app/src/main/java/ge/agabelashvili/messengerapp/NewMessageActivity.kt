@@ -19,6 +19,7 @@ import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import ge.agabelashvili.messengerapp.model.User
+import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.activity_new_message.*
 import kotlinx.android.synthetic.main.user_row_new_message.view.*
 import java.text.FieldPosition
@@ -29,6 +30,7 @@ class NewMessageActivity : AppCompatActivity() {
 
     lateinit var userList : ArrayList<UserItem>
     lateinit var tempUserList : ArrayList<UserItem>
+    lateinit var adapter: GroupAdapter<GroupieViewHolder>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,15 +51,19 @@ class NewMessageActivity : AppCompatActivity() {
                 tempUserList.clear()
                 var searchText  = newText!!.toLowerCase(Locale.getDefault())
                 if (searchText.isNotEmpty() && searchText.length >= 3){
+                    adapter.clear()
+
                     userList.forEach{
                         if(it.user.userName.toLowerCase(Locale.getDefault()).contains(searchText)){
                             tempUserList.add(it)
+                            adapter.add(it)
                         }
                     }
                     //new_message_recyclerView.adapter?.notifyDataSetChanged()
-                }else{
+                }else if(searchText.isEmpty()){
                     tempUserList.clear()
                     tempUserList.addAll((userList))
+                    adapter.addAll(tempUserList)
                     //new_message_recyclerView.adapter?.notifyDataSetChanged()
 
                 }
@@ -77,7 +83,7 @@ class NewMessageActivity : AppCompatActivity() {
         ref.addListenerForSingleValueEvent(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val adapter =  GroupAdapter<GroupieViewHolder>()
+                adapter =  GroupAdapter<GroupieViewHolder>()
 
 
                 snapshot.children.forEach{
