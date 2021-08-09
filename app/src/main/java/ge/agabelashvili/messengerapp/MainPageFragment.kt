@@ -52,53 +52,28 @@ class MainPageFragment : Fragment() {
         val fromId = FirebaseAuth.getInstance().uid
         val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
         val ref = database.getReference("/latest-messages/$fromId").push()
-        ref.addListenerForSingleValueEvent(object: ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                adapter =  GroupAdapter<GroupieViewHolder>()
-
-                val chatMessage = snapshot.getValue(Message::class.java)
-                snapshot.children.forEach{
-                    val msg = it.getValue(MessageModel::class.java)
-                    if(msg!= null) {
-                        var userItem = UserMessagePreviewItem(msg)
-                        adapter.add(userItem)
-                        userList.add(userItem)
-                        tempUserList.add(userItem)
-                    }
-                }
-                /*
-                adapter.setOnItemClickListener{ item, view ->
-                    val curUser = item as UserItem
-                    val intent = Intent(view.context, ChatActivity::class.java)
-                    intent.putExtra(NewMessageActivity.USER_KEY, curUser.user)
-                    startActivity(intent)
-                    //finish()
-                }
-
-                 */
-                chat_list_recycler.adapter = adapter
-
-            }
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
-        })
 
         ref.addChildEventListener(object: ChildEventListener{
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-
+                var children = snapshot.childrenCount
 
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                var children = snapshot.childrenCount
 
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
+                var children = snapshot.childrenCount
+
             }
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                var children = snapshot.childrenCount
+
             }
             override fun onCancelled(error: DatabaseError) {
+
             }
 
         })
