@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -19,7 +18,7 @@ import com.google.firebase.ktx.Firebase
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
-import ge.agabelashvili.messengerapp.model.Message
+import ge.agabelashvili.messengerapp.model.MessageModel
 import ge.agabelashvili.messengerapp.model.User
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.sent_from_me.view.*
@@ -53,7 +52,7 @@ class ChatActivity : AppCompatActivity() {
             val toRef = database.getReference("/user-messages/$toId/$fromId").push()
 
 
-            val message = Message(ref.key!!, toId, fromId!!, txt, System.currentTimeMillis()/1000 )
+            val message = MessageModel(ref.key!!, toId, fromId!!, txt, System.currentTimeMillis()/1000 )
 
             ref.setValue(message)
                 .addOnFailureListener{
@@ -98,7 +97,7 @@ class ChatActivity : AppCompatActivity() {
         ref.addChildEventListener(object: ChildEventListener{
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
 
-                val currentMessage = snapshot.getValue(Message::class.java)
+                val currentMessage = snapshot.getValue(MessageModel::class.java)
                 if(currentMessage != null){
                     val time = convertLongToTime(currentMessage.timeStamp)
 
