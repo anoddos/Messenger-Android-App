@@ -38,15 +38,19 @@ class SettingsFragment : Fragment() {
     lateinit var imageView: ImageView
     private val pickImage = 100
     private var imageUri: Uri? = null
-
+    lateinit var root : View
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.fragment_settings, container, false)
+        root = inflater.inflate(R.layout.fragment_settings, container, false)
 
-        showDataFromFirebase(root)
+        showDataFromFirebase()
+
+        listenToUpdateButto()
+
+        listenToLogoutButton()
 
         imageView = root.findViewById(R.id.ProfilePicture)
         imageView.setOnClickListener {
@@ -54,6 +58,10 @@ class SettingsFragment : Fragment() {
             startActivityForResult(gallery, pickImage)
         }
 
+        return root
+    }
+
+    private fun listenToLogoutButton() {
         val signOutButton : Button = root.findViewById(R.id.sign_out_button)
         signOutButton.setOnClickListener{
             FirebaseAuth.getInstance().signOut()
@@ -62,10 +70,14 @@ class SettingsFragment : Fragment() {
 
             startActivity(intent)
         }
+    }
 
+    private fun listenToUpdateButto() {
         val updateOutButton : Button = root.findViewById(R.id.update_button)
 
         updateOutButton.setOnClickListener{
+            uploadImageToFirebase()
+
             val userName =  root.findViewById<TextView>(R.id.userName).text.toString()
             val position =  root.findViewById<TextView>(R.id.position).text.toString()
 
@@ -89,10 +101,9 @@ class SettingsFragment : Fragment() {
 
                 }
         }
-        return root
     }
 
-    private fun showDataFromFirebase(root: View) {
+    private fun showDataFromFirebase() {
         val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
         val ref = database.getReference("/users")
 
@@ -121,12 +132,13 @@ class SettingsFragment : Fragment() {
         if (resultCode == RESULT_OK && requestCode == pickImage) {
             imageUri = data?.data
             imageView.setImageURI(imageUri)
-            uploadImageToFirebase()
         }
     }
 
 
     private fun uploadImageToFirebase(){
+        if(imageUri == null)return
+
         val fileName = UUID.randomUUID().toString()
         val ref = FirebaseStorage.getInstance().getReference("/images/$fileName")
         ref.putFile(imageUri!!)
