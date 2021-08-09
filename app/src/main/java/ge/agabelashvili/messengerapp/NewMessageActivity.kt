@@ -7,9 +7,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.SearchView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -42,6 +42,7 @@ class NewMessageActivity : AppCompatActivity() {
     companion object{
         val USER_KEY = "USER_KEY"
     }
+
     private fun fetchUsers() {
         val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
         val ref = database.getReference("/users")
@@ -73,6 +74,7 @@ class NewMessageActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
+
                 TODO("Not yet implemented")
             }
 

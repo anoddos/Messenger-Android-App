@@ -5,7 +5,6 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
@@ -48,11 +47,11 @@ class RegisterActivity : AppCompatActivity() {
         val password = Pass.text.toString()
         val position = what_I_Do.text.toString()
         if( email.isEmpty() || password.isEmpty() || position.isEmpty() ){
-            Toast.makeText(this, "Please fill in forms", Toast.LENGTH_SHORT)
+            Toast.makeText(this, "Please fill in forms", Toast.LENGTH_SHORT).show()
             return@register
         }
         if(password.length < 6){
-            Toast.makeText(this, "enter at leas 6 char pass", Toast.LENGTH_SHORT)
+            Toast.makeText(this, "Password length must be at least 6", Toast.LENGTH_SHORT).show()
             return@register
         }
 
@@ -62,8 +61,7 @@ class RegisterActivity : AppCompatActivity() {
                 uploadImageToFirebase()
             }
             .addOnFailureListener{
-                val res = it.toString()
-                Log.d("Register", it.toString())
+                Toast.makeText(this, "Could not create user", Toast.LENGTH_SHORT).show()
             }
 
     }
@@ -80,20 +78,14 @@ class RegisterActivity : AppCompatActivity() {
         ref.putFile(imageUri!!)
             .addOnSuccessListener {
                 FirebaseAuth.getInstance().uid
-                Log.d("Register", "saved image")
                 ref.downloadUrl
                     .addOnSuccessListener {
                     it.toString()
                     saveUserToDb(it.toString())
                 }
-                .addOnFailureListener{
-                    val res = it.toString()
-                    Log.d("Register", it.toString())
-                }
             }
             .addOnFailureListener{
-                val res = it.toString()
-                Log.d("Register", it.toString())
+                Toast.makeText(this, "Could not upload image to storage", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -113,8 +105,7 @@ class RegisterActivity : AppCompatActivity() {
                 startActivity(intent)
             }
             .addOnFailureListener{
-                val res = it.toString()
-                Log.d("Register", it.toString())
+                Toast.makeText(this, "Could not save user information in database", Toast.LENGTH_SHORT).show()
             }
 
     }
