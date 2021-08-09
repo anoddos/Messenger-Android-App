@@ -8,14 +8,26 @@
     <android.widget.Toolbar
         android:id="@+id/newMsgToolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="100dp"
         app:layout_collapseMode="pin"
         android:background="@color/bright_sky"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        
-        />
+
+        >
+        <SearchView
+            android:id="@+id/new_msg_search"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/search_shape"/>
+
+    </android.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/new_message_recyclerView"
