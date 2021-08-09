@@ -19,13 +19,14 @@ class MainActivity : AppCompatActivity() {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
         }
+
     }
 
     fun signIn(view: View) {
         val email = Name.text.toString()
         val password = Password.text.toString()
         if( email.isEmpty() || password.isEmpty() ){
-            Toast.makeText(this, "Please fill in forms", Toast.LENGTH_SHORT)
+            Toast.makeText(this, "Please fill in forms", Toast.LENGTH_SHORT).show()
             return@signIn
         }
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
@@ -34,14 +35,13 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
             .addOnFailureListener{
-                Toast.makeText(this, "nnnnooo", Toast.LENGTH_SHORT)
+                Toast.makeText(this, "Log in failed, please try again", Toast.LENGTH_LONG).show()
                 return@addOnFailureListener
             }
     }
 
 
     fun signUp(view: View) {
-
         val intent = Intent(this, RegisterActivity::class.java)
         startActivity(intent)
     }

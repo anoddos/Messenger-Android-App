@@ -3,10 +3,8 @@ package ge.agabelashvili.messengerapp
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -17,7 +15,6 @@ import com.xwray.groupie.Item
 import ge.agabelashvili.messengerapp.model.User
 import kotlinx.android.synthetic.main.activity_new_message.*
 import kotlinx.android.synthetic.main.user_row_new_message.view.*
-import java.text.FieldPosition
 
 class NewMessageActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,6 +28,7 @@ class NewMessageActivity : AppCompatActivity() {
     companion object{
         val USER_KEY = "USER_KEY"
     }
+
     private fun fetchUsers() {
         val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
         val ref = database.getReference("/users")
@@ -59,6 +57,7 @@ class NewMessageActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
+
                 TODO("Not yet implemented")
             }
 

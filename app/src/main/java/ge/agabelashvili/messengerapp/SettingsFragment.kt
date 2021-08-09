@@ -84,9 +84,6 @@ class SettingsFragment : Fragment() {
             val uid = FirebaseAuth.getInstance().uid
             val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
             database.getReference("/users/$uid/position").setValue(position)
-                .addOnSuccessListener {
-                    //TODO print
-                }
                 .addOnFailureListener{
                     //TODO print
 

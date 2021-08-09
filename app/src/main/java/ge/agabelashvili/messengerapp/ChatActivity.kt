@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
@@ -53,16 +54,14 @@ class ChatActivity : AppCompatActivity() {
 
 
             val message = Message(ref.key!!, toId, fromId!!, txt, System.currentTimeMillis()/1000 )
-            ref.setValue(message)
-                .addOnSuccessListener {
-                }
-                .addOnFailureListener{
-                }
 
-            toRef.setValue(message)
-                .addOnSuccessListener {
-                }
+            ref.setValue(message)
                 .addOnFailureListener{
+                    Toast.makeText(this, "Could not send message", Toast.LENGTH_SHORT).show()
+                }
+            toRef.setValue(message)
+                .addOnFailureListener{
+                    Toast.makeText(this, "Could not receive message", Toast.LENGTH_SHORT).show()
                 }
 
 
@@ -70,7 +69,13 @@ class ChatActivity : AppCompatActivity() {
             val latestMassageRefTo = database.getReference("/latest-messages/$toId/$fromId")
 
             latestMassageRef.setValue(message)
+                .addOnFailureListener{
+                    Toast.makeText(this, "Could not update latest message", Toast.LENGTH_SHORT).show()
+                }
             latestMassageRefTo.setValue(message)
+                .addOnFailureListener{
+                    Toast.makeText(this, "Could not update latest message", Toast.LENGTH_SHORT).show()
+                }
         }
     }
 
