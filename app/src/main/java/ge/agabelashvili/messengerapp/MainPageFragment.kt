@@ -20,6 +20,7 @@ import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import ge.agabelashvili.messengerapp.model.User
 import ge.agabelashvili.messengerapp.model.MessageModel
+import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.activity_new_message.*
 import kotlinx.android.synthetic.main.activity_new_message.new_message_recyclerView
 import kotlinx.android.synthetic.main.fragment_main_page.*
@@ -41,6 +42,7 @@ class MainPageFragment : Fragment() {
         //val navBar: BottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationMenuWrap)
         userList = ArrayList<UserMessagePreviewItem>()
         tempUserList = ArrayList<UserMessagePreviewItem>()
+        adapter =  GroupAdapter<GroupieViewHolder>()
 
         listenForLatestMessages()
 
@@ -51,43 +53,16 @@ class MainPageFragment : Fragment() {
 
         val fromId = FirebaseAuth.getInstance().uid
         val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
-        val ref = database.getReference("/latest-messages/$fromId").push()
-        ref.addListenerForSingleValueEvent(object: ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                adapter =  GroupAdapter<GroupieViewHolder>()
+        val ref = database.getReference("/latest-messages/$fromId")
 
-                val chatMessage = snapshot.getValue(Message::class.java)
-                snapshot.children.forEach{
-                    val msg = it.getValue(MessageModel::class.java)
-                    if(msg!= null) {
-                        var userItem = UserMessagePreviewItem(msg)
-                        adapter.add(userItem)
-                        userList.add(userItem)
-                        tempUserList.add(userItem)
-                    }
-                }
-                /*
-                adapter.setOnItemClickListener{ item, view ->
-                    val curUser = item as UserItem
-                    val intent = Intent(view.context, ChatActivity::class.java)
-                    intent.putExtra(NewMessageActivity.USER_KEY, curUser.user)
-                    startActivity(intent)
-                    //finish()
-                }
-
-                 */
-                chat_list_recycler.adapter = adapter
-
-            }
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
-        })
 
         ref.addChildEventListener(object: ChildEventListener{
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
 
-
+                val currentMessage = snapshot.getValue(MessageModel::class.java)
+                if(currentMessage != null){
+                    adapter.add(UserMessagePreviewItem(currentMessage))
+                }
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
