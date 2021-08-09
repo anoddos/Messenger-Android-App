@@ -23,6 +23,8 @@ import ge.agabelashvili.messengerapp.model.User
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.sent_from_me.view.*
 import kotlinx.android.synthetic.main.sent_to_me.view.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ChatActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,8 +80,8 @@ class ChatActivity : AppCompatActivity() {
         val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
         val ref = database.getReference("/user-messages/$fromId/$toId")
 
-
         val adapter =  GroupAdapter<GroupieViewHolder>()
+
         var layoutManager: LinearLayoutManager = LinearLayoutManager(this)
         layoutManager.stackFromEnd = true
         recyclerView_chat.layoutManager = layoutManager
@@ -87,16 +89,20 @@ class ChatActivity : AppCompatActivity() {
 
         recyclerView_chat.adapter = adapter
         var context: Context = this
+
         ref.addChildEventListener(object: ChildEventListener{
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+
                 val currentMessage = snapshot.getValue(Message::class.java)
                 if(currentMessage != null){
-                    Log.d("sdf", currentMessage.toString() )
-                    if(currentMessage.fromId == FirebaseAuth.getInstance().uid && currentMessage.toId == friend.uid){
-                        adapter.add(ChatToItem(currentMessage.text))
-                    }else if(currentMessage.fromId ==  friend.uid && currentMessage.toId == FirebaseAuth.getInstance().uid){
-                        adapter.add(ChatFromItem(currentMessage.text))
+                    val time = convertLongToTime(currentMessage.timeStamp)
+
+                    if(currentMessage.fromId == FirebaseAuth.getInstance().uid){
+                        adapter.add(ChatToItem(currentMessage.text, time))
+                    }else {
+                        adapter.add(ChatFromItem(currentMessage.text,time))
                     }
+
                     newMsg.text.clear()
                     recyclerView_chat.scrollToPosition(adapter.itemCount - 1)
                     closeSoftKeyboard(context,newMsg)
@@ -122,13 +128,20 @@ class ChatActivity : AppCompatActivity() {
         v.clearFocus()
     }
 
+    fun convertLongToTime(time: Long): String {
+        val date = Date(time*1000)
+        val format = SimpleDateFormat("HH:mm")
+        return format.format(date)
+    }
+
 }
 
 
 
-class ChatFromItem(val text : String): Item<GroupieViewHolder>(){
+class ChatFromItem(val text : String, val time : String): Item<GroupieViewHolder>(){
     override fun bind (viewHolder: GroupieViewHolder, position: Int){
         viewHolder.itemView.message_to_me_txt.text = text
+        viewHolder.itemView.other_message_time.text = time
     }
 
     override fun getLayout(): Int {
@@ -138,9 +151,10 @@ class ChatFromItem(val text : String): Item<GroupieViewHolder>(){
 }
 
 
-class ChatToItem(val text : String): Item<GroupieViewHolder>(){
+class ChatToItem(val text : String, val time : String): Item<GroupieViewHolder>(){
     override fun bind (viewHolder: GroupieViewHolder, position: Int){
         viewHolder.itemView.message_from_me_txt.text = text
+        viewHolder.itemView.my_message_time.text = time
     }
 
     override fun getLayout(): Int {
