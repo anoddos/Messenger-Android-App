@@ -8,10 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.squareup.picasso.Picasso
@@ -64,31 +61,15 @@ class MainPageFragment : Fragment() {
         //chat_list_recycler.adapter = adapter
 
         ref.addListenerForSingleValueEvent(object: ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
+            override fun onDataChange(snapshot: DataSnapshot) {/*
                 val children : Long = snapshot.childrenCount
                 snapshot.children.forEach{ itOut ->
                     val preview = itOut.getValue(MessageModel::class.java)
                     if(preview!= null) {
-                        var id : String = preview.toId
-                        if (preview.fromId != FirebaseAuth.getInstance().uid){
-                            id = preview.fromId
-                        }
-                        val userRef = database.getReference("/users/$id")
-
-                        userRef.get().addOnSuccessListener {
-                           val previewUser =  it.getValue(User::class.java)
-                            if (previewUser != null){
-                                var userItem = UserMessagePreviewItem(preview, previewUser)
-                                adapter.add(userItem)
-                                userList.add(userItem)
-                                tempUserList.add(userItem)
-                            }
-
-                        }
-
-
+                        loadPreviewChat(preview, database)
                     }
                 }
+                */
                 chat_list_recycler.adapter = adapter
 
             }
@@ -98,17 +79,15 @@ class MainPageFragment : Fragment() {
             }
 
         })
+
         ref.addChildEventListener(object: ChildEventListener{
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-/*
-                val currentMessage = snapshot.getValue(MessageModel::class.java)
-                if(currentMessage != null){
-                    var preview =  UserMessagePreviewItem(currentMessage)
-                    adapter.add(preview)
-                }
-                chat_list_recycler.adapter = adapter
 
-*/
+                val currentMessage = snapshot.getValue(MessageModel::class.java)
+                if (currentMessage != null){
+                    loadPreviewChat(currentMessage, database)
+                }
+
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
@@ -131,22 +110,25 @@ class MainPageFragment : Fragment() {
         })
     }
 
-    /*
-        override fun bind (viewHolder: GroupieViewHolder, position: Int){
-
-
-        /*
-        if(user.profileImageUrl != ""){
-            Picasso.get().load(user.profileImageUrl).into(viewHolder.itemView.imageView_new_message)
+    private fun loadPreviewChat(currentMessage: MessageModel, database: FirebaseDatabase){
+        var id : String = currentMessage.toId
+        if (currentMessage.fromId != FirebaseAuth.getInstance().uid){
+            id = currentMessage.fromId
         }
+        val userRef = database.getReference("/users/$id")
 
-         */
+        userRef.get().addOnSuccessListener {
+            val previewUser =  it.getValue(User::class.java)
+            if (previewUser != null){
+                var userItem = UserMessagePreviewItem(currentMessage, previewUser)
+                adapter.add(userItem)
+                userList.add(userItem)
+                tempUserList.add(userItem)
+            }
+
+        }
     }
 
-    override fun getLayout(): Int {
-        return R.layout.message_preview
-    }
-     */
 
 
 }
