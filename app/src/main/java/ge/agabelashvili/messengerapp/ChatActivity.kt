@@ -33,13 +33,14 @@ class ChatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
+        /*
         var toolbar = findViewById(R.id.chat_toolbar) as Toolbar
         setSupportActionBar(toolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true);
         //supportActionBar?.setDisplayShowHomeEnabled(true);
 
-
+*/
 
 
         val user = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
