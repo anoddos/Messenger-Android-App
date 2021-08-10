@@ -87,20 +87,28 @@ class MainPageFragment : Fragment() {
                 if (currentMessage != null){
                     loadPreviewChat(currentMessage, database)
                 }
+                adapter.setOnItemClickListener{ item, view ->
+                    val curUser = item as UserMessagePreviewItem
+                    val intent = Intent(view.context, ChatActivity::class.java)
+                    intent.putExtra(NewMessageActivity.USER_KEY, curUser.user)
+                    startActivity(intent)
+                    //finish()
+                }
 
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
                 var children = snapshot.childrenCount
 
+
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
-                var children = snapshot.childrenCount
+                //var children = snapshot.childrenCount
 
             }
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                var children = snapshot.childrenCount
+                //var children = snapshot.childrenCount
 
             }
             override fun onCancelled(error: DatabaseError) {
