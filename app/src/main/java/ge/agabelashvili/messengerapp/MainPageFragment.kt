@@ -27,6 +27,9 @@ import kotlinx.android.synthetic.main.fragment_main_page.*
 import kotlinx.android.synthetic.main.message_preview.view.*
 import kotlinx.android.synthetic.main.sent_from_me.view.*
 import kotlinx.android.synthetic.main.user_row_new_message.view.*
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MainPageFragment : Fragment() {
 
@@ -56,19 +59,34 @@ class MainPageFragment : Fragment() {
         val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
 
         val ref = database.getReference("/latest-messages/$fromId")
+
         adapter = GroupAdapter<GroupieViewHolder>()
         //chat_list_recycler.adapter = adapter
 
         ref.addListenerForSingleValueEvent(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 val children : Long = snapshot.childrenCount
-                snapshot.children.forEach{
-                    val preview = it.getValue(MessageModel::class.java)
+                snapshot.children.forEach{ itOut ->
+                    val preview = itOut.getValue(MessageModel::class.java)
                     if(preview!= null) {
-                        var userItem = UserMessagePreviewItem(preview)
-                        adapter.add(userItem)
-                        userList.add(userItem)
-                        tempUserList.add(userItem)
+                        var id : String = preview.toId
+                        if (preview.fromId != FirebaseAuth.getInstance().uid){
+                            id = preview.fromId
+                        }
+                        val userRef = database.getReference("/users/$id")
+
+                        userRef.get().addOnSuccessListener {
+                           val previewUser =  it.getValue(User::class.java)
+                            if (previewUser != null){
+                                var userItem = UserMessagePreviewItem(preview, previewUser)
+                                adapter.add(userItem)
+                                userList.add(userItem)
+                                tempUserList.add(userItem)
+                            }
+
+                        }
+
+
                     }
                 }
                 chat_list_recycler.adapter = adapter
@@ -132,15 +150,21 @@ class MainPageFragment : Fragment() {
 
 
 }
-class UserMessagePreviewItem(val message: MessageModel): Item<GroupieViewHolder>(){
+
+
+class UserMessagePreviewItem(val message: MessageModel, val user: User): Item<GroupieViewHolder>(){
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         var id : String = message.toId
         if (message.fromId != FirebaseAuth.getInstance().uid){
             id = message.fromId
         }
-        viewHolder.itemView.preview_username.text = id
+        viewHolder.itemView.preview_username.text = user.userName
         viewHolder.itemView.preview_message_txt.text = message.text
-        viewHolder.itemView.preview_time.text = message.timeStamp.toString()
+
+        viewHolder.itemView.preview_time.text = SimpleDateFormat("HH:mm").format(Date(message.timeStamp*1000))
+        if(user.profileImageUrl != ""){
+            Picasso.get().load(user.profileImageUrl).into(viewHolder.itemView.ProfilePicture)
+        }
     }
 
     override fun getLayout(): Int {
