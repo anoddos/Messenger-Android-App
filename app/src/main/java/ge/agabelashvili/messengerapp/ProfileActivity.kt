@@ -6,6 +6,11 @@ import android.content.Intent
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.xwray.groupie.GroupieViewHolder
+import com.xwray.groupie.Item
+import ge.agabelashvili.messengerapp.model.MessageModel
+import kotlinx.android.synthetic.main.message_preview.view.*
 import kotlinx.android.synthetic.main.navigation.*
 
 class ProfileActivity : AppCompatActivity() {
