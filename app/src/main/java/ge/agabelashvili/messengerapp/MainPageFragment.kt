@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
@@ -45,8 +46,10 @@ class MainPageFragment : Fragment() {
         tempUserList = ArrayList<UserMessagePreviewItem>()
         adapter =  GroupAdapter<GroupieViewHolder>()
 
-        listenForLatestMessages()
 
+        listenForLatestMessages()
+        var searchVew = root.findViewById(R.id.main_page_searh) as SearchView
+        filterChats(searchVew)
         return root
     }
 
@@ -115,6 +118,34 @@ class MainPageFragment : Fragment() {
 
             }
 
+        })
+    }
+
+    private fun filterChats(searchVew: SearchView){
+        searchVew.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+
+                return false
+            }
+            override fun onQueryTextChange(newText: String?): Boolean {
+                tempUserList.clear()
+                var searchText  = newText!!.toLowerCase(Locale.getDefault())
+                if (searchText.isNotEmpty() && searchText.length >= 3){
+                    adapter.clear()
+
+                    userList.forEach{
+                        if(it.user.userName.toLowerCase(Locale.getDefault()).contains(searchText)){
+                            tempUserList.add(it)
+                            adapter.add(it)
+                        }
+                    }
+                }else if(searchText.isEmpty()){
+                    tempUserList.clear()
+                    tempUserList.addAll((userList))
+                    adapter.addAll(tempUserList)
+                }
+                return false
+            }
         })
     }
 
