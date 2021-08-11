@@ -354,6 +354,8 @@ class ChatFromItem(val text: String, val time: String, val audioUrl : String): I
             viewHolder.itemView.message_to_me_txt.text = text
             viewHolder.itemView.other_message_time.text = time
         }else{
+            viewHolder.itemView.other_audio_message_time.text = time
+
             viewHolder.itemView.buttonToMe.setOnClickListener{
                 viewHolder.itemView.buttonFromMe.setOnClickListener{
                     if (!isPLAYING) {
@@ -397,6 +399,8 @@ class ChatToItem(val text: String, val time: String, val audioUrl : String): Ite
             viewHolder.itemView.message_from_me_txt.text = text
             viewHolder.itemView.my_message_time.text = time
         }else{
+            viewHolder.itemView.my_audio_message_time.text = time
+
             viewHolder.itemView.buttonFromMe.setOnClickListener{
                 if (!isPLAYING) {
                     isPLAYING = true
