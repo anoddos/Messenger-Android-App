@@ -54,10 +54,9 @@ class RegisterActivity : AppCompatActivity(), IRegisterView {
 
     fun register(view: View) {
         val nickname = Name.text.toString()
-        val email = "$nickname@gmail.com"
         val password = Pass.text.toString()
         val position = what_I_Do.text.toString()
-        registerPresenter.registerUser(email,password,position,imageUri)
+        registerPresenter.registerUser(nickname,password,position,imageUri)
     }
 
 

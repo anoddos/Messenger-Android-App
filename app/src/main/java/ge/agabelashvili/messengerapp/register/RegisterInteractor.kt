@@ -21,7 +21,7 @@ class RegisterInteractor(val presenter: IRegisterPresenter) {
             presenter.showAppropriateToast("\"Password length must be at least 6\"")
             return
         }
-        FirebaseAuth.getInstance().createUserWithEmailAndPassword(name, password)
+        FirebaseAuth.getInstance().createUserWithEmailAndPassword("$name@gmail.com", password)
                 .addOnSuccessListener {
                     FirebaseAuth.getInstance().uid
                     uploadImageToFirebase(imageUri, position,name)

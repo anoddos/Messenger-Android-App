@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity(), ILogInView {
 
     fun signIn(view: View) {
         var nickname = Name.text.toString()
-        val email = nickname + "@gmail.com"
+        val email = "$nickname@gmail.com"
         val password = Password.text.toString()
 
         loginPresenter.singInUser(email,password)
