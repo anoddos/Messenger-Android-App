@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
+import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
@@ -23,6 +24,7 @@ import kotlinx.android.synthetic.main.activity_new_message.*
 import kotlinx.android.synthetic.main.activity_new_message.new_message_recyclerView
 import kotlinx.android.synthetic.main.fragment_main_page.*
 import kotlinx.android.synthetic.main.message_preview.view.*
+import kotlinx.android.synthetic.main.navigation.*
 import kotlinx.android.synthetic.main.sent_from_me.view.*
 import kotlinx.android.synthetic.main.user_row_new_message.view.*
 import java.text.SimpleDateFormat
@@ -34,6 +36,7 @@ class MainPageFragment : Fragment() {
     lateinit var adapter :  GroupAdapter<GroupieViewHolder>
     lateinit var userList : ArrayList<UserMessagePreviewItem>
     lateinit var tempUserList : ArrayList<UserMessagePreviewItem>
+    private var listener: OnClickListenerInterface? = null
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -45,12 +48,27 @@ class MainPageFragment : Fragment() {
         userList = ArrayList<UserMessagePreviewItem>()
         tempUserList = ArrayList<UserMessagePreviewItem>()
         adapter =  GroupAdapter<GroupieViewHolder>()
+        this.listener = activity as OnClickListenerInterface
+
+
 
 
         listenForLatestMessages()
         var searchVew = root.findViewById(R.id.main_page_searh) as SearchView
         filterChats(searchVew)
         return root
+    }
+
+    private fun listenToRecyclerScroll(){
+        chat_list_recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                listener?.onMyButtonClick(dx,dy)
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+            }
+        })
     }
 
     private fun listenForLatestMessages() {
@@ -74,6 +92,8 @@ class MainPageFragment : Fragment() {
                 }
                 */
                 chat_list_recycler.adapter = adapter
+                listenToRecyclerScroll()
+
 
             }
 
@@ -193,4 +213,8 @@ class UserMessagePreviewItem(val message: MessageModel, val user: User): Item<Gr
     }
 
 
+}
+
+interface OnClickListenerInterface {
+    fun onMyButtonClick(dx: Int, dy: Int)
 }
