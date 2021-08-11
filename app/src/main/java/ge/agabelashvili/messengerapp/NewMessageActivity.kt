@@ -3,6 +3,7 @@ package ge.agabelashvili.messengerapp
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.SearchView
@@ -43,30 +44,39 @@ class NewMessageActivity : AppCompatActivity() {
         fetchUsers()
         val searchView = findViewById(R.id.new_msg_search) as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            private var handler: Handler = Handler()
+            private var runnable: Runnable? = null
+            
             override fun onQueryTextSubmit(query: String): Boolean {
 
                 return false
             }
             override fun onQueryTextChange(newText: String?): Boolean {
-                tempUserList.clear()
-                var searchText  = newText!!.toLowerCase(Locale.getDefault())
-                if (searchText.isNotEmpty() && searchText.length >= 3){
-                    adapter.clear()
-
-                    userList.forEach{
-                        if(it.user.userName.toLowerCase(Locale.getDefault()).contains(searchText)){
-                            tempUserList.add(it)
-                            adapter.add(it)
-                        }
-                    }
-                    //new_message_recyclerView.adapter?.notifyDataSetChanged()
-                }else if(searchText.isEmpty()){
+                if (runnable != null)
+                    handler.removeCallbacks(runnable!!)
+                runnable = Runnable {
                     tempUserList.clear()
-                    tempUserList.addAll((userList))
-                    adapter.addAll(tempUserList)
-                    //new_message_recyclerView.adapter?.notifyDataSetChanged()
+                    var searchText = newText!!.toLowerCase(Locale.getDefault())
+                    if (searchText.isNotEmpty() && searchText.length >= 3) {
+                        adapter.clear()
 
+                        userList.forEach {
+                            if (it.user.userName.toLowerCase(Locale.getDefault()).contains(searchText)) {
+                                tempUserList.add(it)
+                                adapter.add(it)
+                            }
+                        }
+                        //new_message_recyclerView.adapter?.notifyDataSetChanged()
+                    } else if (searchText.isEmpty()) {
+                        tempUserList.clear()
+                        tempUserList.addAll((userList))
+                        adapter.addAll(tempUserList)
+                        //new_message_recyclerView.adapter?.notifyDataSetChanged()
+
+                    }
                 }
+                handler.postDelayed(runnable!!, 400);
+                return false
                 return false
             }
         })

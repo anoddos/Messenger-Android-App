@@ -2,6 +2,7 @@ package ge.agabelashvili.messengerapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.os.Message
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -37,6 +38,7 @@ class MainPageFragment : Fragment() {
     lateinit var userList : ArrayList<UserMessagePreviewItem>
     lateinit var tempUserList : ArrayList<UserMessagePreviewItem>
     private var listener: OnClickListenerInterface? = null
+
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -145,27 +147,35 @@ class MainPageFragment : Fragment() {
 
     private fun filterChats(searchVew: SearchView){
         searchVew.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            private var handler: Handler = Handler()
+            private var runnable: Runnable? = null
+
             override fun onQueryTextSubmit(query: String): Boolean {
 
                 return false
             }
             override fun onQueryTextChange(newText: String?): Boolean {
-                tempUserList.clear()
-                var searchText  = newText!!.toLowerCase(Locale.getDefault())
-                if (searchText.isNotEmpty() && searchText.length >= 3){
-                    adapter.clear()
-
-                    userList.forEach{
-                        if(it.user.userName.toLowerCase(Locale.getDefault()).contains(searchText)){
-                            tempUserList.add(it)
-                            adapter.add(it)
-                        }
-                    }
-                }else if(searchText.isEmpty()){
+                if (runnable != null)
+                    handler.removeCallbacks(runnable!!)
+                runnable = Runnable {
                     tempUserList.clear()
-                    tempUserList.addAll((userList))
-                    adapter.addAll(tempUserList)
+                    var searchText = newText!!.toLowerCase(Locale.getDefault())
+                    if (searchText.isNotEmpty() && searchText.length >= 3) {
+                        adapter.clear()
+
+                        userList.forEach {
+                            if (it.user.userName.toLowerCase(Locale.getDefault()).contains(searchText)) {
+                                tempUserList.add(it)
+                                adapter.add(it)
+                            }
+                        }
+                    } else if (searchText.isEmpty()) {
+                        tempUserList.clear()
+                        tempUserList.addAll((userList))
+                        adapter.addAll(tempUserList)
+                    }
                 }
+                handler.postDelayed(runnable!!, 400);
                 return false
             }
         })
