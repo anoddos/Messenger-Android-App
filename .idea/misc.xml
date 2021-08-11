@@ -4,8 +4,13 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/layout/activity_chat.xml" value="0.17916666666666667" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.17916666666666667" />
+        <entry key="app/src/main/res/layout/activity_register.xml" value="0.17916666666666667" />
+        <entry key="app/src/main/res/layout/chat_info_bar.xml" value="0.17916666666666667" />
         <entry key="app/src/main/res/layout/from_me_audio.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/to_me_audio.xml" value="0.17916666666666667" />
+        <entry key="app/src/main/res/layout/sent_from_me.xml" value="0.17916666666666667" />
+        <entry key="app/src/main/res/layout/sent_to_me.xml" value="0.17916666666666667" />
+        <entry key="app/src/main/res/layout/to_me_audio.xml" value="0.1" />
         <entry key="app/src/main/res/layout/user_row_new_message.xml" value="0.17916666666666667" />
       </map>
     </option>
