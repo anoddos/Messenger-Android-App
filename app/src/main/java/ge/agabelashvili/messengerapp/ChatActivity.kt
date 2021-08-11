@@ -4,13 +4,18 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.app.Activity
 import android.content.Context
+import android.media.MediaRecorder
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
@@ -19,6 +24,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
@@ -27,11 +33,17 @@ import ge.agabelashvili.messengerapp.model.User
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.sent_from_me.view.*
 import kotlinx.android.synthetic.main.sent_to_me.view.*
+import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
 
 class ChatActivity : AppCompatActivity() {
+
+    private var mRecorder: MediaRecorder? = null
+    private lateinit var mFileName: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
@@ -52,7 +64,83 @@ class ChatActivity : AppCompatActivity() {
         listenToComingMessages(user!!)
 
         listenToSendMessage(user!!)
+
+        listenToRecordButton()
     }
+
+    private fun onRecord(start: Boolean) = if (start) {
+        startRecording()
+    } else {
+        stopRecording()
+    }
+
+    private fun listenToRecordButton() {
+        recorder.setOnClickListener{
+            var mStartRecording = true
+
+            onRecord(mStartRecording)
+        }
+    }
+
+    private fun startRecording() {
+        mFileName = externalCacheDir!!.absolutePath
+        mFileName += "/" + UUID.randomUUID().toString() + ".3gp"
+        val YOUR_REQUEST_CODE = 200
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+
+
+
+        }
+        mRecorder = MediaRecorder().apply {
+            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+            setOutputFile(mFileName)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+
+            try {
+                prepare()
+            } catch (e: IOException) {
+                Log.e(LOG_TAG, "prepare() failed")
+            }
+
+            start()
+        }
+    }
+
+    private fun stopRecording() {
+        mRecorder?.apply {
+            stop()
+            release()
+        }
+        mRecorder = null
+        uploadAudio()
+    }
+
+    private fun uploadAudio() {
+        val uriAudio = Uri.fromFile(File(mFileName).getAbsoluteFile())
+
+        val ref = FirebaseStorage.getInstance().getReference("/audios/$mFileName")
+        FirebaseAuth.getInstance().uid
+        ref.putFile(uriAudio!!)
+            .addOnSuccessListener {
+                FirebaseAuth.getInstance().uid
+                ref.downloadUrl
+                    .addOnSuccessListener {
+                        it.toString()
+                    }
+            }
+            .addOnFailureListener{
+                Toast.makeText(this, "Could not upload image to storage", Toast.LENGTH_SHORT).show()
+            }
+
+    }
+
+    companion object {
+        private val LOG_TAG = "Record_log"
+    }
+
+
 
     private fun listnToChatRecycler(){
         recyclerView_chat.addOnScrollListener(object : RecyclerView.OnScrollListener() {
