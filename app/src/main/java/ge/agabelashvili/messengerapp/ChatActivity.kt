@@ -292,10 +292,13 @@ class ChatActivity : AppCompatActivity() {
             .addOnFailureListener{
                 Toast.makeText(this, "Could not send message", Toast.LENGTH_SHORT).show()
             }
-        toRef.setValue(message)
-            .addOnFailureListener{
-                Toast.makeText(this, "Could not receive message", Toast.LENGTH_SHORT).show()
-            }
+
+        if(fromId != toId) {
+            toRef.setValue(message)
+                .addOnFailureListener {
+                    Toast.makeText(this, "Could not receive message", Toast.LENGTH_SHORT).show()
+                }
+        }
 
         val latestMassageRef = database.getReference("/latest-messages/$fromId/$toId")
         val latestMassageRefTo = database.getReference("/latest-messages/$toId/$fromId")
@@ -304,10 +307,14 @@ class ChatActivity : AppCompatActivity() {
             .addOnFailureListener{
                 Toast.makeText(this, "Could not update latest message", Toast.LENGTH_SHORT).show()
             }
-        latestMassageRefTo.setValue(message)
-            .addOnFailureListener{
-                Toast.makeText(this, "Could not update latest message", Toast.LENGTH_SHORT).show()
-            }
+
+        if(fromId != toId) {
+            latestMassageRefTo.setValue(message)
+                .addOnFailureListener {
+                    Toast.makeText(this, "Could not update latest message", Toast.LENGTH_SHORT)
+                        .show()
+                }
+        }
     }
 
     private fun sendAudioAsMessage(audioUrl: String) {
