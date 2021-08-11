@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.media.MediaRecorder
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -18,7 +17,6 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -35,51 +33,53 @@ import com.xwray.groupie.Item
 import ge.agabelashvili.messengerapp.model.MessageModel
 import ge.agabelashvili.messengerapp.model.User
 import kotlinx.android.synthetic.main.activity_chat.*
+import kotlinx.android.synthetic.main.from_me_audio.view.*
 import kotlinx.android.synthetic.main.sent_from_me.view.*
 import kotlinx.android.synthetic.main.sent_to_me.view.*
+import kotlinx.android.synthetic.main.to_me_audio.view.*
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
-import com.google.firebase.storage.StorageReference
-
-
-
+import android.media.MediaPlayer
 
 
 class ChatActivity : AppCompatActivity() {
 
     private var mRecorder: MediaRecorder? = null
     private lateinit var mFileName: String
+    private lateinit var friend: User
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
-        /*
-        var toolbar = findViewById(R.id.chat_toolbar) as Toolbar
-        setSupportActionBar(toolbar)
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true);
-        //supportActionBar?.setDisplayShowHomeEnabled(true);
-
-*/
         chat_app_bar.setExpanded(true)
 
+        friend = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)!!
 
-        val user = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
-
-        listenToComingMessages(user!!)
-
-        listenToSendMessage(user!!)
+        listenToComingMessages()
 
         listenToRecordButton()
     }
 
 
+    fun onSendMessageClick(view: View?) {
+        val txt = chat_log.text.toString()
+        val fromId = FirebaseAuth.getInstance().uid
+        val toId = friend.uid
+
+        val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
+        val ref = database.getReference("/user-messages/$fromId/$toId").push()
+
+        val message = MessageModel(ref.key!!, toId, fromId!!, txt, System.currentTimeMillis() / 1000, "")
+        sendMessage(message)
+    }
 
 
-    private fun listnToChatRecycler(){
+
+    private fun listenToChatRecycler(){
         recyclerView_chat.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (dy > 0 && !recyclerView.canScrollVertically(1)) {
@@ -132,47 +132,8 @@ class ChatActivity : AppCompatActivity() {
         return super.onContextItemSelected(item)
     }
 
-    private fun listenToSendMessage(friend: User) {
-        send_button.setOnClickListener{
 
-            val txt = chat_log.text.toString()
-            val fromId = FirebaseAuth.getInstance().uid
-            val toId = friend.uid
-
-
-            val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
-
-            val ref = database.getReference("/user-messages/$fromId/$toId").push()
-            val toRef = database.getReference("/user-messages/$toId/$fromId").push()
-
-
-            val message = MessageModel(ref.key!!, toId, fromId!!, txt, System.currentTimeMillis() / 1000)
-
-            ref.setValue(message)
-                .addOnFailureListener{
-                    Toast.makeText(this, "Could not send message", Toast.LENGTH_SHORT).show()
-                }
-            toRef.setValue(message)
-                .addOnFailureListener{
-                    Toast.makeText(this, "Could not receive message", Toast.LENGTH_SHORT).show()
-                }
-
-
-            val latestMassageRef = database.getReference("/latest-messages/$fromId/$toId")
-            val latestMassageRefTo = database.getReference("/latest-messages/$toId/$fromId")
-
-            latestMassageRef.setValue(message)
-                .addOnFailureListener{
-                    Toast.makeText(this, "Could not update latest message", Toast.LENGTH_SHORT).show()
-                }
-            latestMassageRefTo.setValue(message)
-                .addOnFailureListener{
-                    Toast.makeText(this, "Could not update latest message", Toast.LENGTH_SHORT).show()
-                }
-        }
-    }
-
-    private fun listenToComingMessages(friend: User) {
+    private fun listenToComingMessages() {
         val fromId =FirebaseAuth.getInstance().uid
         val toId = friend.uid
         val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
@@ -186,7 +147,7 @@ class ChatActivity : AppCompatActivity() {
         val newMsg: EditText =  findViewById(R.id.chat_log)
 
         recyclerView_chat.adapter = adapter
-        listnToChatRecycler()
+        listenToChatRecycler()
         var context: Context = this
 
         ref.addChildEventListener(object : ChildEventListener {
@@ -197,9 +158,9 @@ class ChatActivity : AppCompatActivity() {
                     val time = convertLongToTime(currentMessage.timeStamp)
 
                     if (currentMessage.fromId == FirebaseAuth.getInstance().uid) {
-                        adapter.add(ChatToItem(currentMessage.text, time))
+                        adapter.add(ChatToItem(currentMessage.text, time, currentMessage.audioUrl))
                     } else {
-                        adapter.add(ChatFromItem(currentMessage.text, time))
+                        adapter.add(ChatFromItem(currentMessage.text, time, currentMessage.audioUrl))
                     }
 
                     newMsg.text.clear()
@@ -272,7 +233,6 @@ class ChatActivity : AppCompatActivity() {
         mFileName = externalCacheDir!!.absolutePath
         mFileName += "/" + UUID.randomUUID().toString() + ".3gp"
 
-
         mRecorder = MediaRecorder().apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
@@ -301,8 +261,6 @@ class ChatActivity : AppCompatActivity() {
     private fun uploadAudio() {
         Log.e(LOG_TAG, "starting upload/$mFileName")
 
-        //val ref = FirebaseStorage.getInstance().getReference("/audios/$mFileName")
-
         val uriAudio = Uri.fromFile(File(mFileName).getAbsoluteFile())
         val ref = FirebaseStorage.getInstance().getReference("/audios").child(uriAudio.lastPathSegment!!)
 
@@ -312,11 +270,55 @@ class ChatActivity : AppCompatActivity() {
                 ref.downloadUrl
                     .addOnSuccessListener {
                         it.toString()
+                        sendAudioAsMessage(it.toString())
                     }
             }
             .addOnFailureListener{
                 Toast.makeText(this, "Could not upload image to storage", Toast.LENGTH_SHORT).show()
             }
+
+    }
+
+    private fun sendMessage(message: MessageModel){
+        val fromId = FirebaseAuth.getInstance().uid
+        val toId = friend.uid
+        val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
+
+        val ref = database.getReference("/user-messages/$fromId/$toId").push()
+        val toRef = database.getReference("/user-messages/$toId/$fromId").push()
+
+        ref.setValue(message)
+            .addOnFailureListener{
+                Toast.makeText(this, "Could not send message", Toast.LENGTH_SHORT).show()
+            }
+        toRef.setValue(message)
+            .addOnFailureListener{
+                Toast.makeText(this, "Could not receive message", Toast.LENGTH_SHORT).show()
+            }
+
+        val latestMassageRef = database.getReference("/latest-messages/$fromId/$toId")
+        val latestMassageRefTo = database.getReference("/latest-messages/$toId/$fromId")
+
+        latestMassageRef.setValue(message)
+            .addOnFailureListener{
+                Toast.makeText(this, "Could not update latest message", Toast.LENGTH_SHORT).show()
+            }
+        latestMassageRefTo.setValue(message)
+            .addOnFailureListener{
+                Toast.makeText(this, "Could not update latest message", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun sendAudioAsMessage(audioUrl: String) {
+
+        val fromId = FirebaseAuth.getInstance().uid
+        val toId = friend.uid
+        val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
+        val ref = database.getReference("/user-messages/$fromId/$toId").push()
+        val toRef = database.getReference("/user-messages/$toId/$fromId").push()
+
+        val message = MessageModel(ref.key!!, toId, fromId!!, "", System.currentTimeMillis() / 1000, audioUrl)
+        sendMessage(message)
 
     }
 
@@ -333,42 +335,96 @@ class ChatActivity : AppCompatActivity() {
                 // app.
                 onRecord(true)
             } else {
-                val noPermition = true
-                // Explain to the user that the feature is unavailable because the
-                // features requires a permission that the user has denied. At the
-                // same time, respect the user's decision. Don't link to system
-                // settings in an effort to convince the user to change their
-                // decision.
+                val noPermission = true
+                Toast.makeText(this, "Please give application permission to use microphone", Toast.LENGTH_SHORT).show()
             }
         }
 
-
-
 }
 
 
 
-class ChatFromItem(val text: String, val time: String): Item<GroupieViewHolder>(){
+class ChatFromItem(val text: String, val time: String, val audioUrl : String): Item<GroupieViewHolder>(){
     override fun bind(viewHolder: GroupieViewHolder, position: Int){
-        viewHolder.itemView.message_to_me_txt.text = text
-        viewHolder.itemView.other_message_time.text = time
+        var mp : MediaPlayer? = null
+        var isPLAYING = false
+
+        if(audioUrl == ""){
+            viewHolder.itemView.message_to_me_txt.text = text
+            viewHolder.itemView.other_message_time.text = time
+        }else{
+            viewHolder.itemView.buttonToMe.setOnClickListener{
+                viewHolder.itemView.buttonFromMe.setOnClickListener{
+                    if (!isPLAYING) {
+                        isPLAYING = true
+                        mp = MediaPlayer()
+                        try {
+                            mp!!.setDataSource(audioUrl)
+                            mp!!.prepare()
+                            mp!!.start()
+                        } catch (e: IOException) {
+
+                        }
+                    } else {
+                        isPLAYING = false
+                        mp!!.release();
+                        mp = null;
+                    }
+                }
+            }
+        }
     }
 
     override fun getLayout(): Int {
-        return R.layout.sent_to_me
+        return if(audioUrl == ""){
+            R.layout.sent_to_me
+        }else{
+            R.layout.to_me_audio
+        }
+
     }
 
 }
 
 
-class ChatToItem(val text: String, val time: String): Item<GroupieViewHolder>(){
+class ChatToItem(val text: String, val time: String, val audioUrl : String): Item<GroupieViewHolder>(){
     override fun bind(viewHolder: GroupieViewHolder, position: Int){
-        viewHolder.itemView.message_from_me_txt.text = text
-        viewHolder.itemView.my_message_time.text = time
+        var mp : MediaPlayer? = null
+        var isPLAYING = false
+
+        if(audioUrl == ""){
+            viewHolder.itemView.message_from_me_txt.text = text
+            viewHolder.itemView.my_message_time.text = time
+        }else{
+            viewHolder.itemView.buttonFromMe.setOnClickListener{
+                if (!isPLAYING) {
+                    isPLAYING = true
+                    mp = MediaPlayer()
+                    try {
+                        mp!!.setDataSource(audioUrl)
+                        mp!!.prepare()
+                        mp!!.start()
+                    } catch (e: IOException) {
+
+                    }
+                } else {
+                    isPLAYING = false
+                    mp!!.release();
+                    mp = null;
+                }
+
+            }
+        }
+
     }
 
+
     override fun getLayout(): Int {
-        return R.layout.sent_from_me
+        return if(audioUrl == ""){
+            R.layout.sent_from_me
+        }else{
+            R.layout.from_me_audio
+        }
     }
 
 }

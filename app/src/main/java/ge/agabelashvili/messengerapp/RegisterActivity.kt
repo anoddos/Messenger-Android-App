@@ -47,8 +47,7 @@ class RegisterActivity : AppCompatActivity() {
 
     fun register(view: View) {
 
-        var nickname = Name.text.toString()
-        val email = nickname + "@gmail.com"
+        val email = Name.text.toString() + "@gmail.com"
         val password = Pass.text.toString()
         val position = what_I_Do.text.toString()
         if( email.isEmpty() || password.isEmpty() || position.isEmpty() ){
