@@ -41,6 +41,10 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import com.google.firebase.storage.StorageReference
+
+
+
 
 
 class ChatActivity : AppCompatActivity() {
@@ -72,110 +76,6 @@ class ChatActivity : AppCompatActivity() {
         listenToRecordButton()
     }
 
-
-
-
-    private fun onRecord(start: Boolean) = if (start) {
-        startRecording()
-    } else {
-        stopRecording()
-    }
-
-    private fun listenToRecordButton() {
-        recorder.setOnClickListener{
-            var mStartRecording = true
-
-            when (PackageManager.PERMISSION_GRANTED) {
-                ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.RECORD_AUDIO
-                ) -> {
-
-                    onRecord(mStartRecording)
-                    // You can use the API that requires the permission.
-                }
-                else -> {
-                    // You can directly ask for the permission.
-                    // The registered ActivityResultCallback gets the result of this request.
-                    requestPermissionLauncher.launch(
-                        Manifest.permission.RECORD_AUDIO)
-                }
-            }
-
-        }
-    }
-
-    private fun startRecording() {
-        mFileName = externalCacheDir!!.absolutePath
-        mFileName += "/" + UUID.randomUUID().toString() + ".3gp"
-
-
-        mRecorder = MediaRecorder().apply {
-            setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-            setOutputFile(mFileName)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-
-            try {
-                prepare()
-            } catch (e: IOException) {
-                Log.e(LOG_TAG, "prepare() failed")
-            }
-
-            start()
-        }
-    }
-
-    private fun stopRecording() {
-        mRecorder?.apply {
-            stop()
-            release()
-        }
-        mRecorder = null
-        uploadAudio()
-    }
-
-    private fun uploadAudio() {
-        Log.e(LOG_TAG, "starting upload")
-        val uriAudio = Uri.fromFile(File(mFileName).getAbsoluteFile())
-
-        val ref = FirebaseStorage.getInstance().getReference("/audios/$mFileName")
-        FirebaseAuth.getInstance().uid
-        ref.putFile(uriAudio!!)
-            .addOnSuccessListener {
-                FirebaseAuth.getInstance().uid
-                ref.downloadUrl
-                    .addOnSuccessListener {
-                        it.toString()
-                    }
-            }
-            .addOnFailureListener{
-                Toast.makeText(this, "Could not upload image to storage", Toast.LENGTH_SHORT).show()
-            }
-
-    }
-
-    companion object {
-        private val LOG_TAG = "Record_log"
-    }
-
-    val requestPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                // Permission is granted. Continue the action or workflow in your
-                // app.
-                onRecord(true)
-            } else {
-                val noPermition = true
-                // Explain to the user that the feature is unavailable because the
-                // features requires a permission that the user has denied. At the
-                // same time, respect the user's decision. Don't link to system
-                // settings in an effort to convince the user to change their
-                // decision.
-            }
-        }
 
 
 
@@ -335,6 +235,114 @@ class ChatActivity : AppCompatActivity() {
         val format = SimpleDateFormat("HH:mm")
         return format.format(date)
     }
+
+
+    private fun listenToRecordButton() {
+        var mStartRecording = true
+        recorder.setOnClickListener{
+
+            when (PackageManager.PERMISSION_GRANTED) {
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.RECORD_AUDIO
+                ) -> {
+
+                    onRecord(mStartRecording)
+                    mStartRecording = !mStartRecording
+                    // You can use the API that requires the permission.
+                }
+                else -> {
+                    // You can directly ask for the permission.
+                    // The registered ActivityResultCallback gets the result of this request.
+                    requestPermissionLauncher.launch(
+                        Manifest.permission.RECORD_AUDIO)
+                }
+            }
+
+        }
+    }
+
+    private fun onRecord(start: Boolean) = if (start) {
+        startRecording()
+    } else {
+        stopRecording()
+    }
+
+    private fun startRecording() {
+        mFileName = externalCacheDir!!.absolutePath
+        mFileName += "/" + UUID.randomUUID().toString() + ".3gp"
+
+
+        mRecorder = MediaRecorder().apply {
+            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+            setOutputFile(mFileName)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+
+            try {
+                prepare()
+            } catch (e: IOException) {
+                Log.e(LOG_TAG, "prepare() failed")
+            }
+
+            start()
+        }
+    }
+
+    private fun stopRecording() {
+        mRecorder?.apply {
+            stop()
+            release()
+        }
+        mRecorder = null
+        uploadAudio()
+    }
+
+    private fun uploadAudio() {
+        Log.e(LOG_TAG, "starting upload/$mFileName")
+
+        //val ref = FirebaseStorage.getInstance().getReference("/audios/$mFileName")
+
+        val uriAudio = Uri.fromFile(File(mFileName).getAbsoluteFile())
+        val ref = FirebaseStorage.getInstance().getReference("/audios").child(uriAudio.lastPathSegment!!)
+
+        ref.putFile(uriAudio!!)
+            .addOnSuccessListener {
+                val f = it
+                ref.downloadUrl
+                    .addOnSuccessListener {
+                        it.toString()
+                    }
+            }
+            .addOnFailureListener{
+                Toast.makeText(this, "Could not upload image to storage", Toast.LENGTH_SHORT).show()
+            }
+
+    }
+
+    companion object {
+        private val LOG_TAG = "Record_log"
+    }
+
+    val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                // Permission is granted. Continue the action or workflow in your
+                // app.
+                onRecord(true)
+            } else {
+                val noPermition = true
+                // Explain to the user that the feature is unavailable because the
+                // features requires a permission that the user has denied. At the
+                // same time, respect the user's decision. Don't link to system
+                // settings in an effort to convince the user to change their
+                // decision.
+            }
+        }
+
+
 
 }
 
