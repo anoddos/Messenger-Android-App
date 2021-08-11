@@ -357,7 +357,7 @@ class ChatFromItem(val text: String, val time: String, val audioUrl : String): I
             viewHolder.itemView.other_audio_message_time.text = time
 
             viewHolder.itemView.buttonToMe.setOnClickListener{
-                viewHolder.itemView.buttonFromMe.setOnClickListener{
+                viewHolder.itemView.buttonToMe.setOnClickListener{
                     if (!isPLAYING) {
                         isPLAYING = true
                         mp = MediaPlayer()
