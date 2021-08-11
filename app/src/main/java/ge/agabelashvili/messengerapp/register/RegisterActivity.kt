@@ -56,6 +56,15 @@ class RegisterActivity : AppCompatActivity(), IRegisterView {
         val nickname = Name.text.toString()
         val password = Pass.text.toString()
         val position = what_I_Do.text.toString()
+
+        if( nickname.isEmpty() || password.isEmpty() || position.isEmpty() ){
+            showFailReason("Please fill in forms")
+            return@register
+        }
+        if(password.length < 6){
+            showFailReason("\"Password length must be at least 6\"")
+            return@register
+        }
         registerPresenter.registerUser(nickname,password,position,imageUri)
     }
 

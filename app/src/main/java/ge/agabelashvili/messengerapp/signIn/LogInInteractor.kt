@@ -18,11 +18,7 @@ import java.util.*
 class LogInInteractor(val presenter: ILogInPresenter) {
     fun singInUser(name: String, password: String){
        // presenter.showAppropriateToast( "Please fill in forms")
-        
-        if( name.isEmpty() || password.isEmpty() ){
-            presenter.showAppropriateToast( "Please fill in forms")
-            return
-        }
+
         FirebaseAuth.getInstance().signInWithEmailAndPassword(name, password)
                 .addOnSuccessListener {
                     presenter.onUserSignedIn()

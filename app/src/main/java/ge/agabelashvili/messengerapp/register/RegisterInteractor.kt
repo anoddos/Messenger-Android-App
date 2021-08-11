@@ -13,14 +13,7 @@ import java.util.*
 class RegisterInteractor(val presenter: IRegisterPresenter) {
 
     fun registerUser(name: String, password: String, position: String, imageUri: Uri?) {
-        if( name.isEmpty() || password.isEmpty() || position.isEmpty() ){
-            presenter.showAppropriateToast("Please fill in forms")
-            return
-        }
-        if(password.length < 6){
-            presenter.showAppropriateToast("\"Password length must be at least 6\"")
-            return
-        }
+
         FirebaseAuth.getInstance().createUserWithEmailAndPassword("$name@gmail.com", password)
                 .addOnSuccessListener {
                     FirebaseAuth.getInstance().uid

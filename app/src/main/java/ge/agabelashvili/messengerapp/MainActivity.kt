@@ -36,6 +36,10 @@ class MainActivity : AppCompatActivity(), ILogInView {
         val email = "$nickname@gmail.com"
         val password = Password.text.toString()
 
+        if( nickname.isEmpty() || password.isEmpty() ){
+            showFailReason( "Please fill in forms")
+            return
+        }
         loginPresenter.singInUser(email,password)
     }
 
