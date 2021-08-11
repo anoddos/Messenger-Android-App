@@ -12,6 +12,7 @@ import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import ge.agabelashvili.messengerapp.model.MessageModel
 import kotlinx.android.synthetic.main.fragment_main_page.*
+import kotlinx.android.synthetic.main.fragment_settings.view.*
 import kotlinx.android.synthetic.main.message_preview.view.*
 import kotlinx.android.synthetic.main.navigation.*
 
@@ -57,8 +58,11 @@ class ProfileActivity : AppCompatActivity(), OnClickListenerInterface  {
     override fun onMyButtonClick(dx: Int, dy: Int) {
         if (dy > 0 && BottomNavBarWrap.isShown) {
             BottomNavBarWrap.visibility = View.GONE
-        } else if (dy < 0) {
+            background_img.setBackgroundResource(R.color.bright_sky)
+        } else if (dy < 0 && !chat_list_recycler.canScrollVertically(-1)) {
             BottomNavBarWrap.visibility = View.VISIBLE
+            background_img.setBackgroundResource(R.drawable.background)
+
         }
     }
 
