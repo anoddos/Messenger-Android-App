@@ -80,6 +80,8 @@ class MainPageFragment : Fragment() {
 
         adapter = GroupAdapter<GroupieViewHolder>()
         //chat_list_recycler.adapter = adapter
+        //chat_list_recycler.adapter = adapter
+        //listenToRecyclerScroll()
 
         ref.addListenerForSingleValueEvent(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {/*

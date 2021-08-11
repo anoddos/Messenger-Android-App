@@ -5,13 +5,22 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import com.google.firebase.auth.FirebaseAuth
-import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+import com.google.firebase.auth.FirebaseAuth
+import ge.agabelashvili.messengerapp.register.RegisterActivity
+import ge.agabelashvili.messengerapp.register.RegisterPresenter
+import ge.agabelashvili.messengerapp.signIn.ILogInView
+import ge.agabelashvili.messengerapp.signIn.LogInPresenter
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.Name
+import kotlinx.android.synthetic.main.activity_register.*
+
+class MainActivity : AppCompatActivity(), ILogInView {
+    private lateinit var loginPresenter : LogInPresenter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        loginPresenter = LogInPresenter(this)
 
         val uid = FirebaseAuth.getInstance().uid
         if(uid != null){
@@ -23,26 +32,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun signIn(view: View) {
-        val email = Name.text.toString()
+        var nickname = Name.text.toString()
+        val email = nickname + "@gmail.com"
         val password = Password.text.toString()
-        if( email.isEmpty() || password.isEmpty() ){
-            Toast.makeText(this, "Please fill in forms", Toast.LENGTH_SHORT).show()
-            return@signIn
-        }
-        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
-            .addOnSuccessListener {
-                val intent = Intent(this, ProfileActivity::class.java)
-                startActivity(intent)
-            }
-            .addOnFailureListener{
-                Toast.makeText(this, "Log in failed, please try again", Toast.LENGTH_LONG).show()
-                return@addOnFailureListener
-            }
+
+        loginPresenter.singInUser(email,password)
     }
 
 
     fun signUp(view: View) {
         val intent = Intent(this, RegisterActivity::class.java)
+        startActivity(intent)
+    }
+
+    override fun showFailReason(reason: String) {
+        Toast.makeText(this, reason, Toast.LENGTH_LONG).show()
+    }
+
+    override fun showSuccess() {
+        val intent = Intent(this, ProfileActivity::class.java)
         startActivity(intent)
     }
 }

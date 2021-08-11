@@ -36,14 +36,6 @@ class ChatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
-        /*
-        var toolbar = findViewById(R.id.chat_toolbar) as Toolbar
-        setSupportActionBar(toolbar)
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true);
-        //supportActionBar?.setDisplayShowHomeEnabled(true);
-
-*/
         chat_app_bar.setExpanded(true)
 
 

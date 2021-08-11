@@ -4,5 +4,5 @@ import ge.agabelashvili.messengerapp.model.User
 
 interface IRegisterView {
     fun showFailReason(reason: String)
-    fun showSuccess(registeredUsed: User)
+    fun showSuccess()
 }
