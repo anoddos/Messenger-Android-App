@@ -78,8 +78,6 @@ class MainPageFragment : Fragment() {
 
         val ref = database.getReference("/latest-messages/$fromId")
 
-        adapter = GroupAdapter<GroupieViewHolder>()
-        //chat_list_recycler.adapter = adapter
 
         ref.addListenerForSingleValueEvent(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {/*

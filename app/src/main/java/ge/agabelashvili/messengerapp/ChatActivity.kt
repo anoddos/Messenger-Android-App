@@ -1,9 +1,11 @@
 package ge.agabelashvili.messengerapp
 
+import android.Manifest
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.app.Activity
 import android.content.Context
+import android.content.pm.PackageManager
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Build
@@ -14,8 +16,10 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
@@ -68,6 +72,9 @@ class ChatActivity : AppCompatActivity() {
         listenToRecordButton()
     }
 
+
+
+
     private fun onRecord(start: Boolean) = if (start) {
         startRecording()
     } else {
@@ -78,20 +85,31 @@ class ChatActivity : AppCompatActivity() {
         recorder.setOnClickListener{
             var mStartRecording = true
 
-            onRecord(mStartRecording)
+            when (PackageManager.PERMISSION_GRANTED) {
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.RECORD_AUDIO
+                ) -> {
+
+                    onRecord(mStartRecording)
+                    // You can use the API that requires the permission.
+                }
+                else -> {
+                    // You can directly ask for the permission.
+                    // The registered ActivityResultCallback gets the result of this request.
+                    requestPermissionLauncher.launch(
+                        Manifest.permission.RECORD_AUDIO)
+                }
+            }
+
         }
     }
 
     private fun startRecording() {
         mFileName = externalCacheDir!!.absolutePath
         mFileName += "/" + UUID.randomUUID().toString() + ".3gp"
-        val YOUR_REQUEST_CODE = 200
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
 
 
-
-        }
         mRecorder = MediaRecorder().apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
@@ -118,6 +136,7 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun uploadAudio() {
+        Log.e(LOG_TAG, "starting upload")
         val uriAudio = Uri.fromFile(File(mFileName).getAbsoluteFile())
 
         val ref = FirebaseStorage.getInstance().getReference("/audios/$mFileName")
@@ -139,6 +158,24 @@ class ChatActivity : AppCompatActivity() {
     companion object {
         private val LOG_TAG = "Record_log"
     }
+
+    val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                // Permission is granted. Continue the action or workflow in your
+                // app.
+                onRecord(true)
+            } else {
+                val noPermition = true
+                // Explain to the user that the feature is unavailable because the
+                // features requires a permission that the user has denied. At the
+                // same time, respect the user's decision. Don't link to system
+                // settings in an effort to convince the user to change their
+                // decision.
+            }
+        }
 
 
 
