@@ -23,7 +23,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun signIn(view: View) {
-        val email = Name.text.toString()
+        var nickname = Name.text.toString()
+        val email = nickname + "@gmail.com"
         val password = Password.text.toString()
         if( email.isEmpty() || password.isEmpty() ){
             Toast.makeText(this, "Please fill in forms", Toast.LENGTH_SHORT).show()

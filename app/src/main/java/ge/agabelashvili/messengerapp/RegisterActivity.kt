@@ -13,7 +13,10 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import ge.agabelashvili.messengerapp.model.User
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_register.*
+import kotlinx.android.synthetic.main.activity_register.Name
+import kotlinx.android.synthetic.main.activity_register.ProfilePicture
 import java.util.*
 
 class RegisterActivity : AppCompatActivity() {
@@ -43,7 +46,9 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     fun register(view: View) {
-        val email = Name.text.toString()
+
+        var nickname = Name.text.toString()
+        val email = nickname + "@gmail.com"
         val password = Pass.text.toString()
         val position = what_I_Do.text.toString()
         if( email.isEmpty() || password.isEmpty() || position.isEmpty() ){
