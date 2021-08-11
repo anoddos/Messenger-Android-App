@@ -1,16 +1,18 @@
 package ge.agabelashvili.messengerapp
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.app.Activity
 import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.widget.Toolbar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -28,6 +30,7 @@ import kotlinx.android.synthetic.main.sent_to_me.view.*
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 class ChatActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +44,7 @@ class ChatActivity : AppCompatActivity() {
         //supportActionBar?.setDisplayShowHomeEnabled(true);
 
 */
+        chat_app_bar.setExpanded(true)
 
 
         val user = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
@@ -48,6 +52,49 @@ class ChatActivity : AppCompatActivity() {
         listenToComingMessages(user!!)
 
         listenToSendMessage(user!!)
+    }
+
+    private fun listnToChatRecycler(){
+        recyclerView_chat.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0 && !recyclerView.canScrollVertically(1)) {
+                    //chat_app_bar.setExpanded(true)
+                    //chat_app_bar.layoutParams.height += 80
+
+                    //toolbar_img.visibility = View.VISIBLE
+                   // toolbar_img.animate().translationY(toolbar_img.height.toFloat());
+                    toolbar_img.animate()
+                            .translationY(0F)
+                            .alpha(1.0f)
+                            .setDuration(100)
+                            .setListener(object : AnimatorListenerAdapter() {
+                                override fun onAnimationEnd(animation: Animator?) {
+                                    super.onAnimationEnd(animation)
+                                    toolbar_img.visibility = View.VISIBLE
+                                }
+                            })
+
+                } else if (dy < 0) {
+                   // toolbar_img.visibility = View.GONE
+                   // toolbar_img.animate().translationY(0F);
+                    toolbar_img.animate()
+                            .translationY(toolbar_img.height.toFloat())
+                            .alpha(0.0f)
+                            .setDuration(100)
+                            .setListener(object : AnimatorListenerAdapter() {
+                                override fun onAnimationEnd(animation: Animator?) {
+                                    super.onAnimationEnd(animation)
+                                    toolbar_img.visibility = View.GONE
+                                }
+                            })
+                    //chat_app_bar.setExpanded(false)
+                }
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+            }
+        })
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
@@ -60,7 +107,7 @@ class ChatActivity : AppCompatActivity() {
         return super.onContextItemSelected(item)
     }
 
-    private fun listenToSendMessage( friend: User) {
+    private fun listenToSendMessage(friend: User) {
         send_button.setOnClickListener{
 
             val txt = chat_log.text.toString()
@@ -74,7 +121,7 @@ class ChatActivity : AppCompatActivity() {
             val toRef = database.getReference("/user-messages/$toId/$fromId").push()
 
 
-            val message = MessageModel(ref.key!!, toId, fromId!!, txt, System.currentTimeMillis()/1000 )
+            val message = MessageModel(ref.key!!, toId, fromId!!, txt, System.currentTimeMillis() / 1000)
 
             ref.setValue(message)
                 .addOnFailureListener{
@@ -100,7 +147,7 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
-    private fun listenToComingMessages( friend: User) {
+    private fun listenToComingMessages(friend: User) {
         val fromId =FirebaseAuth.getInstance().uid
         val toId = friend.uid
         val database = Firebase.database("https://messenger-app-78b6b-default-rtdb.europe-west1.firebasedatabase.app/")
@@ -114,33 +161,37 @@ class ChatActivity : AppCompatActivity() {
         val newMsg: EditText =  findViewById(R.id.chat_log)
 
         recyclerView_chat.adapter = adapter
+        listnToChatRecycler()
         var context: Context = this
 
-        ref.addChildEventListener(object: ChildEventListener{
+        ref.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
 
                 val currentMessage = snapshot.getValue(MessageModel::class.java)
-                if(currentMessage != null){
+                if (currentMessage != null) {
                     val time = convertLongToTime(currentMessage.timeStamp)
 
-                    if(currentMessage.fromId == FirebaseAuth.getInstance().uid){
+                    if (currentMessage.fromId == FirebaseAuth.getInstance().uid) {
                         adapter.add(ChatToItem(currentMessage.text, time))
-                    }else {
-                        adapter.add(ChatFromItem(currentMessage.text,time))
+                    } else {
+                        adapter.add(ChatFromItem(currentMessage.text, time))
                     }
 
                     newMsg.text.clear()
                     recyclerView_chat.scrollToPosition(adapter.itemCount - 1)
-                    closeSoftKeyboard(context,newMsg)
+                    closeSoftKeyboard(context, newMsg)
                 }
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
             }
+
             override fun onChildRemoved(snapshot: DataSnapshot) {
             }
+
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
             }
+
             override fun onCancelled(error: DatabaseError) {
             }
 
@@ -155,7 +206,7 @@ class ChatActivity : AppCompatActivity() {
     }
 
     fun convertLongToTime(time: Long): String {
-        val date = Date(time*1000)
+        val date = Date(time * 1000)
         val format = SimpleDateFormat("HH:mm")
         return format.format(date)
     }
@@ -164,8 +215,8 @@ class ChatActivity : AppCompatActivity() {
 
 
 
-class ChatFromItem(val text : String, val time : String): Item<GroupieViewHolder>(){
-    override fun bind (viewHolder: GroupieViewHolder, position: Int){
+class ChatFromItem(val text: String, val time: String): Item<GroupieViewHolder>(){
+    override fun bind(viewHolder: GroupieViewHolder, position: Int){
         viewHolder.itemView.message_to_me_txt.text = text
         viewHolder.itemView.other_message_time.text = time
     }
@@ -177,8 +228,8 @@ class ChatFromItem(val text : String, val time : String): Item<GroupieViewHolder
 }
 
 
-class ChatToItem(val text : String, val time : String): Item<GroupieViewHolder>(){
-    override fun bind (viewHolder: GroupieViewHolder, position: Int){
+class ChatToItem(val text: String, val time: String): Item<GroupieViewHolder>(){
+    override fun bind(viewHolder: GroupieViewHolder, position: Int){
         viewHolder.itemView.message_from_me_txt.text = text
         viewHolder.itemView.my_message_time.text = time
     }
