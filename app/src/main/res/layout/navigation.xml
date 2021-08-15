@@ -20,7 +20,7 @@
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/BottomNavBarWrap"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
 
         app:fabCradleMargin="10dp"
         app:fabCradleRoundedCornerRadius="10dp"

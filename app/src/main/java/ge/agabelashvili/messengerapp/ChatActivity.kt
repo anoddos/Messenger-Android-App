@@ -56,7 +56,6 @@ class ChatActivity : AppCompatActivity() {
         setContentView(R.layout.activity_chat)
 
         chat_app_bar.setExpanded(true)
-        setSupportActionBar(chat_toolbar)
 
         // showing the back button in action bar
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
